@@ -1,0 +1,47 @@
+% hello.tex - Our first LaTeX example!
+
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\begin{document}
+
+\title{Correlating entities based on DSL specifications of entity group relations}
+\author{Erik Brännström\\
+  Chalmers University of Technology}
+\date{}
+\maketitle
+
+\section{Introduction}
+Duego was founded in 2010 with the idea of creating a social networking site that would target people who wanted to meet new people. This stand in contrast to the existing networks that either manage people who the user already know (e.g. Facebook) or where the user try to find a life partner (i.e. dating sites).
+Online advertisement is leveraged as a way to promote the site to new users. This is done both using targeted ads that are adapted based on the target demographics on social networks, as well as more conventional ads on websites. Today, managing these campaigns is a manual process that is outsourced to another company.
+The wish of Duego is to automate this process using software. Such a system would be required to analyze the existing campaigns with regard to ads and target groups along with campaign metrics such as clicks per impression, conversion ratio, etcetera, and use this data to suggest, or even automatically add, new campaign ads.
+
+\section{Problem}
+The problem statement given in the background section is described from the view of Duego, however it can be generalized into a much more general problem in the sphere of software engineering.
+
+Firstly, the terms entity, entity group and metrics need to be defined. An entity is something that has distinct properties that enables it to be compared to other entities. As such, entities do not have to be unique, and two separate entities are further defined to be equal if they share the same properties of which the corresponding values are equal.
+
+An entity group is the set of all entities that share one or more defined property values as given by the group definition. In object-oriented terms, an entity group would be a class where as entities are instances of classes (i.e. objects). Metrics is by definition a specific entity group, however for the sake of clarity I have chosen not to refer to it as such, as it is considered such an important concept in the problem statement.
+
+By analyzing entities that belong to separate entity groups, I wish to identify correlations between unique properties of these with the goal of maximizing the appropriate metrics. Metrics are in turn measured for each combination of two entities that are not of the same type. The expected input to the resulting system are entities and their metrics which should yield an output of new combinations consisting of either already existing entities or suggested new entities.
+
+The most prominent problem to be solved is how to design an algorithm that can efficiently calculate these correlations for large amounts of data. The data set that will be used in production consists of tens of millions of these entities, which means hundreds of millions of properties that should be correlated. Such data sizes can generally not be handled using ordinary brute-force-type algorithms, but requires some form of heuristics to increase efficiency while decreasing accuracy. Another expected requirement is to not have to run all previous data through the system each time, but rather caching results and improving them incrementally.
+
+\section{Relevance}
+The requirements discussed in the problem description are closely related to both the field of machine learning as well as that of algorithms and algorithm design, meaning that the final product will most likely have to incorporate strategies from both fields.
+
+\section{Approach}
+The general problem can be divided into three subtasks that need to be completed in order to create a system that fulfill the defined requirements.
+\begin{itemize}
+	\item Create a domain specific language (DSL) for specifying the desired entity groups, their relations and which properties to optimize
+	\item Design algorithm for optimizing the defined task which can be proven to provide output of high quality 
+	\item Extend system with machine learning methods to increase data handling capabilities without causing output quality to drop below reasonable thresholds
+\end{itemize}
+Since the general solution to the problem will simultaneously be applied to a specific problem area (described in the background), the definitions of quality are based on customer expectations. As such, it is recommended that the thesis work is performed using an agile approach to maximize the impact of input from supervisors both at Duego as well as Chalmers University of Technology.
+
+\section{Verification}
+The result of the thesis work would be verified by applying the results to the problem suggested by Duego in a real-world setting. The suggested advertisement and target groups from the system will be added to Facebook which will allow us to analyze the effectiveness of the software. This can be done continuously over the course of the development in addition to more traditional software unit and system testing.
+
+\end{document}
