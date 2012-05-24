@@ -1,9 +1,10 @@
 % hello.tex - Our first LaTeX example!
 
-\documentclass{article}
+\documentclass[a4paper]{article}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{natbib}
 
 \begin{document}
 
@@ -13,10 +14,20 @@
 \date{}
 \maketitle
 
+\section{Relevant keywords}
+data correlation, data mining, mining association rules, dsl
+
 \section{Introduction}
 Duego was founded in 2010 with the idea of creating a social networking site that would target people who wanted to meet new people. This stand in contrast to the existing networks that either manage people who the user already know (e.g. Facebook) or where the user try to find a life partner (i.e. dating sites).
 Online advertisement is leveraged as a way to promote the site to new users. This is done both using targeted ads that are adapted based on the target demographics on social networks, as well as more conventional ads on websites. Today, managing these campaigns is a manual process that is outsourced to another company.
 The wish of Duego is to automate this process using software. Such a system would be required to analyze the existing campaigns with regard to ads and target groups along with campaign metrics such as clicks per impression, conversion ratio, etcetera, and use this data to suggest, or even automatically add, new campaign ads.
+
+\section{Related works \& foundations}
+An interesting area in data mining is association rule learning. \citet{Agrawal1993} describe how, given a large set of transactions containing any number of different items, rules can be identified between these items. In the case of commerce, such rules would describe how the purchase of one product would, with a probability above a certain threshold, also infer the purchase of another product.
+
+\citet{Chen1996} give an overview of the field of data mining where they mention the aspect of multi-level data mining, which states that correlations may not commonly exist on the lowest level of granularity, but instead by forming groups of related items. An example given would be that a specific brand of milk does not necessarily imply the purchase of a specific brand of bread, however purchasing milk of any kind may still be correlated to the purchase of bread irrespective of brand.
+
+A thorough literature study on domain-specific languages is covered by \citet{Deursen2000}, and the phases of development in the creation of a new DSL is described in detail by \citet{Mernik2005}.
 
 \section{Problem}
 The problem statement given in the background section is described from the view of Duego, however it can be generalized into a much more general problem in the sphere of software engineering.
@@ -45,8 +56,6 @@ Since the general solution to the problem will simultaneously be applied to a sp
 \section{Verification}
 The result of the thesis work would be verified by applying the results to the problem suggested by Duego in a real-world setting. The suggested advertisement and target groups from the system will be added to Facebook which will allow us to analyze the effectiveness of the software. This can be done continuously over the course of the development in addition to more traditional software unit and system testing.
 
-\section{Related works \& foundations}
-
 \section{Project plan}
 The proposed workflow of this thesis is inspired by the agile practices that perhaps most notably have become 
 common in the software development industry. The most important methods that should be applied to this work are
@@ -61,6 +70,8 @@ The initial iteration will most likely require a heavy focus on research and stu
 iterations will all include work on the three areas mentioned in section \ref{sec:approach} on page \pageref{sec:approach}. It is however expected that the DSL description will be prioritized more heavily in the earlier iterations until it stabilizes, and that effort on algorithm heuristics will increase as the project nears its end.
 
 \section{Thesis outline}
+Todo
 
-
+\bibliographystyle{plainnat}
+\bibliography{references} % references.bib
 \end{document}
