@@ -1,0 +1,39 @@
+% hello.tex - Our first LaTeX example!
+
+\documentclass[a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+% Remove the author and date fields and the space associated with them
+% from the definition of maketitle!
+\makeatletter
+\renewcommand{\@maketitle}{
+\newpage
+ \null
+ \vskip 2em%
+ \begin{center}%
+  {\LARGE \@title \par}%
+ \end{center}%
+ \par} \makeatother
+
+\begin{document}
+
+\title{Meeting minutes}
+\maketitle
+
+\textbf{Date:} May 25th, 2012
+
+\textbf{Location:} Duego
+
+\textbf{Attending:} Erik, Matthias, Håkan
+
+\begin{itemize}
+	\item Håkan described Duego’s business idea and Matthias his academic background.
+    \item Matthias explained the master’s thesis process. The required tasks for the thesis include a half-time presentation with the examiner, final thesis submission and presentation, and opposing another student’s thesis. Beside this, Matthias prefers frequent meetings (e.g. weekly) with the thesis student, an extended proposal (7-8 pages), continuous work on the written report and a subject that in some way pushes the field forward.
+    \item Håkan explained the problem that Duego wishes to find a solution for in greater detail. In summary, they would like to have an automated system that, based on historical data for ads, could identify success factors that can be used in the future.
+    \item Discussion on what is part of the thesis, and what is not. The actual creation of new ads and integration with API’s of service providers will be out of scope for this thesis.
+    \item Matthias is leaving for a conference next week and will not be back until June 19th. Next meeting will therefore be held at June 21st at 15:00. The extended proposal should be sent to Matthias two days earlier (June 19th).
+\end{itemize}
+
+ \end{document}

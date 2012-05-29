@@ -22,12 +22,22 @@ Duego was founded in 2010 with the idea of creating a social networking site tha
 Online advertisement is leveraged as a way to promote the site to new users. This is done both using targeted ads that are adapted based on the target demographics on social networks, as well as more conventional ads on websites. Today, managing these campaigns is a manual process that is outsourced to another company.
 The wish of Duego is to automate this process using software. Such a system would be required to analyze the existing campaigns with regard to ads and target groups along with campaign metrics such as clicks per impression, conversion ratio, etcetera, and use this data to suggest, or even automatically add, new campaign ads.
 
-\section{Related works \& foundations}
+\section{Related works}
+Useful terminology is defined by \citet{IBM2006} in the field of autonomic computing. An autonomic manager is a component that collects data from a system and, based on this data, performs actions with the purpose of improving the system. This control loop is divided into four sub-tasks called monitor (collect system information), analyze (correlate and model data), plan (design behaviour required to reach goal) and execute (run the planned actions), sometimes refered to as MAPE.
+
 An interesting area in data mining is association rule learning. \citet{Agrawal1993} describe how, given a large set of transactions containing any number of different items, rules can be identified between these items. In the case of commerce, such rules would describe how the purchase of one product would, with a probability above a certain threshold, also infer the purchase of another product.
+
+\citet{Srikant1997} expands the above research by applying contraints on the items in the resulting association rules. These constraints can either be expressed using specific items or with taxonomy rules, e.g. if an item is a descendant or ancestor of another item.
 
 \citet{Chen1996} give an overview of the field of data mining where they mention the aspect of multi-level data mining, which states that correlations may not commonly exist on the lowest level of granularity, but instead by forming groups of related items. An example given would be that a specific brand of milk does not necessarily imply the purchase of a specific brand of bread, however purchasing milk of any kind may still be correlated to the purchase of bread irrespective of brand.
 
 A thorough literature study on domain-specific languages is covered by \citet{Deursen2000}, and the phases of development in the creation of a new DSL is described in detail by \citet{Mernik2005}.
+
+\section{Foundations}
+
+The use of item contraints in association rule mining \citep{Srikant1997} can most likely be used for this project. The relation between target groups and ads can, based on existing metrics, be restructured into a transactional table where each transaction is an impression (in the case of the impression per click metrics) so that each entry would have an attribute stating whether or not the impression yielded a click. The item constraint would then be used to only formulate association rules that lead to clicks.
+
+Another alternative would be to use clustering algorithms to identify attributes which appear to increase the specified metrics. The problem with this approach is the fact that most attributes are discrete values belonging to infinite sets.
 
 \section{Problem}
 The problem statement given in the background section is described from the view of Duego, however it can be generalized into a much more general problem in the sphere of software engineering.
