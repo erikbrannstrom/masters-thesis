@@ -37,8 +37,9 @@ states that correlations may not commonly exist on the lowest level of granulari
 items. An example given would be that a specific brand of milk does not necessarily imply the purchase of a specific brand of 
 bread, however purchasing milk of any kind may still be correlated to the purchase of bread irrespective of brand.
 
-A thorough literature study on domain-specific languages is covered by \citet{Deursen2000}, and the phases of development in 
-the creation of a new DSL is described in detail by \citet{Mernik2005}.
+Another area in data mining is that of classifiers, and more specifically decision trees. \citet{Quinlan1986} decribe how
+decision trees can be created from a training set and how well it handles the problems of unknown attributes values and noise
+in the data.
 
 \section{Foundations}
 
@@ -52,9 +53,13 @@ Considering that the original market basket problem assumes binary attributes an
 quantative and categorical data, \citep{Srikant1996} gives a useful description on how such values can be mapped onto the
 binary (or boolean) problem space.
 
-\citet{Hahsler07} presents a package for the R software environment used in statistical computing, which implements a base
+\citet{Hahsler2007} presents a package for the R software environment used in statistical computing, which implements a base
 for transaction databases as well as integration with two of the most common mining algorithms, Apriori and Eclat. One of the
 clever implementation choices is the use of the sparse matrix data structure, which greatly reduces the memory load.
+
+A thorough literature study on domain-specific languages is covered by \citet{Deursen2000}, and the phases of development in 
+the creation of a new DSL is described in detail by \citet{Mernik2005}. The latter provides insight into the relevant choices
+that need be made in the creation process as well as a useful terminology for discussing common DSL topics.
 
 \section{Suggested problems}
 \begin{itemize}
@@ -83,8 +88,8 @@ for the supervisors to have their feedback incorporated.
 
 The initial iteration will most likely require a heavy focus on research and studies of the related fields. The following
 iterations will all include work on the three areas mentioned in section \ref{sec:approach} on page \pageref{sec:approach}.
-It is however expected that the DSL description will be prioritized more heavily in the earlier iterations until it
-stabilizes, and that effort on algorithm heuristics will increase as the project nears its end.
+Once the research has progressed to an extent that the problem space as well as the approach of the solution are well defined, 
+more effort can be put into the development of the final application that is to be used by Duego.
 
 \section{Thesis outline}
 Todo
