@@ -26,3 +26,5 @@
 *.maf
 *.mtc
 *.mtc0
+
+*.class
