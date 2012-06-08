@@ -28,3 +28,6 @@
 *.mtc0
 
 *.class
+
+/Misc
+/Papers
