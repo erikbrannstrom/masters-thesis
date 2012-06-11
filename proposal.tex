@@ -12,6 +12,16 @@
 \date{}
 \maketitle
 
+\section{Introduction}
+Duego was founded in 2010 with the idea of creating a social networking site that would target people who wanted to meet new
+people. This stand in contrast to the existing networks that either manage people who the user already know (e.g. Facebook)
+or where the user try to find a life partner (i.e. dating sites). Online advertisement is leveraged as a way to promote the
+site to new users. This is done both using targeted ads that are adapted based on the target demographics on social networks,
+as well as more conventional ads on websites. Today, managing these campaigns is a manual process that is outsourced to
+another company. The wish of Duego is to automate this process using software. Such a system would be required to analyze
+the existing campaigns with regard to ads and target groups along with campaign metrics such as clicks per impression,
+conversion ratio, etcetera, and use this data to suggest, or even automatically add, new campaign ads.
+
 \section{Related works}
 Useful terminology is defined by \citet{IBM2006} in the field of autonomic computing. An autonomic manager is a component that
 collects data from a system and, based on this data, performs actions with the purpose of improving the system. This control
@@ -37,6 +47,12 @@ decision trees can be created from a training set and how well it handles the pr
 in the data.
 
 \section{Foundations}
+
+A number of high-level descriptions of frameworks for knowledge discovery in databases (KDD) exist \citep{Fayyad1996,Frawley1992} 
+and they exhibit a number of commonalities. These include the importance of having a knowledgeble human operator guiding the 
+process in terms of supplying domain knowledge to the system formulating the goal of the knowledge discovery; feeding discovered
+knowledge back into the system; and the identification and application of a discovery method, or more specifically the data mining
+algorithm(s). 
 
 In data mining, the input to a system can be described using the terms \emph{concepts}, \emph{instances} and \emph{attributes},
 where concept is the actual result of the mining, i.e. what we want to be learned; an instance is one single example of data to be
@@ -68,10 +84,10 @@ help define a useful terminology for discussing the topic of domain-specific lan
 
 \section{Suggested problems}
 \begin{itemize}
-	\item Define a DSL for transforming a relational data structure with metrics into a transaction-like table,
-			perhaps also with taxonomies for generalizing values.
-	\item Modify an existing association rule mining algorithm to work directly with non-transaction-like tables.
-	\item Integrate existing transaction metrics to reduce load on rule mining algorithm.
+	\item Compare the rules in a decision tree with those of an association rule mining algorithm in regard to performance and
+			quality.
+	\item Case-study of the KDD process in online marketing.
+	\item Literature study on the topic of KDD/data mining/decision trees.
 \end{itemize}
 
 \section{Questions}
@@ -100,16 +116,6 @@ more effort can be put into the development of the final application that is to 
 Todo
 
 \section{Original proposal}
-
-\subsection{Introduction}
-Duego was founded in 2010 with the idea of creating a social networking site that would target people who wanted to meet new
-people. This stand in contrast to the existing networks that either manage people who the user already know (e.g. Facebook)
-or where the user try to find a life partner (i.e. dating sites). Online advertisement is leveraged as a way to promote the
-site to new users. This is done both using targeted ads that are adapted based on the target demographics on social networks,
-as well as more conventional ads on websites. Today, managing these campaigns is a manual process that is outsourced to
-another company. The wish of Duego is to automate this process using software. Such a system would be required to analyze
-the existing campaigns with regard to ads and target groups along with campaign metrics such as clicks per impression,
-conversion ratio, etcetera, and use this data to suggest, or even automatically add, new campaign ads.
 
 \subsection{Problem}
 The problem statement given in the background section is described from the view of Duego, however it can be generalized into
