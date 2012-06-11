@@ -14,9 +14,6 @@
 \date{}
 \maketitle
 
-\section{Relevant keywords}
-data correlation, data mining, mining association rules, dsl
-
 \section{Related works}
 Useful terminology is defined by \citet{IBM2006} in the field of autonomic computing. An autonomic manager is a component that
 collects data from a system and, based on this data, performs actions with the purpose of improving the system. This control
@@ -42,6 +39,14 @@ decision trees can be created from a training set and how well it handles the pr
 in the data.
 
 \section{Foundations}
+
+In data mining, the input to a system can be described using the terms \emph{concepts}, \emph{instances} and \emph{attributes},
+where concept is the actual result of the mining, i.e. what we want to be learned; an instance is one single example of data to be
+mined and can be compared to a row in a database; and attribute is a property of an instance, which in the database analogy would
+be a column \citep{Witten2011}.
+
+The Weka Project has defined an input format to be used for their open source data mining software called ARFF (Attribute-Relation
+File Format).
 
 The use of item contraints in association rule mining \citep{Srikant1997} can most likely be used for this project. The
 relation between target groups and ads can, based on existing metrics, be restructured into a transactional table where each
