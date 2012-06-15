@@ -14,45 +14,41 @@
 
 \section{Introduction}
 Duego was founded in 2010 with the idea of creating a social networking site that would target people who wanted to meet new
-people. This stand in contrast to the existing networks that either manage people who the user already know (e.g. Facebook)
+people. This stands in contrast to the existing networks that either manage people who the user already know (e.g. Facebook)
 or where the user try to find a life partner (i.e. dating sites). Online advertisement is leveraged as a way to promote the
 site to new users. This is done both using targeted ads that are adapted based on the target demographics on social networks,
 as well as more conventional ads on websites. Today, managing these campaigns is a manual process that is outsourced to
-another company. The wish of Duego is to automate this process using software. Such a system would be required to analyze
-the existing campaigns with regard to ads and target groups along with campaign metrics such as clicks per impression,
-conversion ratio, etcetera, and use this data to suggest, or even automatically add, new campaign ads.
+another company.
 
-\section{Related works}
+The wish of Duego is to automate this process using software. Such a system would be required to analyze the existing campaigns
+with regard to ads and target groups along with campaign metrics such as clicks per impression, conversion ratio, etcetera, and
+use this data to suggest, or even automatically add, new campaign ads. The data set that will be used in production consists of
+hundreds of different campaigns, each with a large number of ads. Along with the attributes of both campaigns and ads, this means
+that the complete advertisement data set consists of hundreds of thousands of attributes to be analyzed.
+
+This problem statement is described from the view of Duego, however it can be generalized into a broader problem in the sphere of
+software engineering, namely knowledge discovery in databases (KDD) or more specifically data mining. Data mining is the process
+of delegating and automating the task of identifying useful knowledge in a large set of data to a computer, either fully or
+partially. The somewhat philosophical discussion of what knowledge really is and how to define what is useful knowledge will not,
+however, be covered in this paper.
+
+\section{Scope}
 Useful terminology is defined by \citet{IBM2006} in the field of autonomic computing. An autonomic manager is a component that
 collects data from a system and, based on this data, performs actions with the purpose of improving the system. This control
 loop is divided into four sub-tasks called monitor (collect system information), analyze (correlate and model data), plan
 (design behaviour required to reach goal) and execute (run the planned actions), sometimes refered to as MAPE.
 
-An interesting area in data mining is association rule learning. \citet{Agrawal1993} describe how, given a large set of
-transactions containing any number of different items, rules can be identified between these items. In the case of commerce,
-such rules would describe how the purchase of one product would, with a probability above a certain threshold, also infer
-the purchase of another product.
-
-\citet{Srikant1997} expands the above research by applying contraints on the items in the resulting association rules. These
-constraints can either be expressed using specific items or with taxonomy rules, e.g. if an item is a descendant or ancestor
-of another item.
-
-\citet{Chen1996} give an overview of the field of data mining where they mention the aspect of multi-level data mining, which
-states that correlations may not commonly exist on the lowest level of granularity, but instead by forming groups of related
-items. An example given would be that a specific brand of milk does not necessarily imply the purchase of a specific brand of
-bread, however purchasing milk of any kind may still be correlated to the purchase of bread irrespective of brand.
-
-Another area in data mining is that of classifiers, and more specifically decision trees. \citet{Quinlan1986} decribe how
-decision trees can be created from a training set and how well it handles the problems of unknown attributes values and noise
-in the data.
+Using this framework, only the analysis and planning tasks are considered part of this paper, where as monitoring and execution
+is out of scope. The latter two are however relevant in the verification step, but will not be covered as a research topic. In
+this context, this means for example that the feature of integrating this system with marketing services to automatically add new
+ads and campaigns will not be a part of the final system.
 
 \section{Foundations}
-
-A number of high-level descriptions of frameworks for knowledge discovery in databases (KDD) exist \citep{Fayyad1996,Frawley1992} 
-and they exhibit a number of commonalities. These include the importance of having a knowledgeble human operator guiding the 
+A number of high-level descriptions of frameworks for knowledge discovery in databases exist \citep{Fayyad1996, Frawley1992}
+and they exhibit a number of commonalities. These include the importance of having a knowledgeble human operator guiding the
 process in terms of supplying domain knowledge to the system formulating the goal of the knowledge discovery; feeding discovered
 knowledge back into the system; and the identification and application of a discovery method, or more specifically the data mining
-algorithm(s). 
+algorithm(s).
 
 In data mining, the input to a system can be described using the terms \emph{concepts}, \emph{instances} and \emph{attributes},
 where concept is the actual result of the mining, i.e. what we want to be learned; an instance is one single example of data to be
@@ -60,21 +56,15 @@ mined and can be compared to a row in a database; and attribute is a property of
 be a column \citep{Witten2011}.
 
 The Weka Project has defined an input format to be used for their open source data mining software called ARFF (Attribute-Relation
-File Format).
+File Format) \citep{Garner1995, Witten2011}. This format is used by the Weka software package, but is well-defined and can be used
+as the input format for custom systems as well.
 
-The use of item contraints in association rule mining \citep{Srikant1997} can most likely be used for this project. The
-relation between target groups and ads can, based on existing metrics, be restructured into a transactional table where each
-transaction is an impression (in the case of the impression per click metrics) so that each entry would have an attribute
-stating whether or not the impression yielded a click. The item constraint would then be used to only formulate association
-rules that lead to clicks.
-
-Considering that the original market basket problem assumes binary attributes and that relational data can contain both
-quantative and categorical data, \citep{Srikant1996} gives a useful description on how such values can be mapped onto the
-binary (or boolean) problem space.
-
-\citet{Hahsler2007} presents a package for the R software environment used in statistical computing, which implements a base
-for transaction databases as well as integration with two of the most common mining algorithms, Apriori and Eclat. One of the
-clever implementation choices is the use of the sparse matrix data structure, which greatly reduces the memory load.
+In a highly influential paper, \citet{Quinlan1986} decribe how decision trees can be created from a training set and how well it
+handles the problem of unknown attributes values and noisy data. A related paper, \citet{Quinlan1987}, deal with how generated
+decision trees can be simplified in order to more easily be applied. Four different methods are evaluated, one of which is the
+reformulation of the tree as a set of production rules. This specific topic is further analyzed in \citet{Quinlan1987b} where such
+production rules are shown to be more compact and also in many cases improve the classification of unseen data. An added positive
+effect is that production rules from separate classifications can be merged more efficiently than their original decision trees.
 
 A thorough literature study on domain-specific languages is covered by \citet{Deursen2000} and covers high-level topics, such as
 potential benefits and risks of using DSLs and exemplifying with a number of languages from different areas. The article also
@@ -82,92 +72,85 @@ mentions the phases of development in the creation of a new DSL, a topic which i
 The latter article also provides insight into the relevant choices that need be made in the creation process, and both articles
 help define a useful terminology for discussing the topic of domain-specific languages.
 
-\section{Suggested problems}
+\section{Related works}
+\citet{Chen1996} give an overview of the field of data mining where they mention the aspect of multi-level data mining, which
+states that correlations may not commonly exist on the lowest level of granularity, but instead by forming groups of related
+items. An example given would be that a specific brand of milk does not necessarily imply the purchase of a specific brand of
+bread, however purchasing milk of any kind may still be correlated to the purchase of bread irrespective of brand.
+
+A related area in data mining is association rule learning. \citet{Agrawal1993} describe how, given a large set of
+transactions containing any number of different items, rules can be identified between these items. In the case of commerce,
+such rules would describe how the purchase of one product would, with a probability above a certain threshold, also infer
+the purchase of another product. This method could be applicable for the problem in this paper, even though it is more of a
+classification problem, and some of the necessary extensions of the method are mentioned below.
+
+\citet{Srikant1997} expands the above research by applying contraints on the items in the resulting association rules. These
+constraints can either be expressed using specific items or with taxonomy rules, e.g. if an item is a descendant or ancestor
+of another item. For this problem, the relation between target groups and ads can, based on existing metrics, be restructured into
+a transactional table where each transaction is an impression (in the case of the impression per click metrics) so that each entry
+would have an attribute stating whether or not the impression yielded a click. The item constraint would then be used to only
+formulate association rules that lead to clicks.
+
+Considering that the original market basket problem assumes binary attributes and that relational data can contain both
+quantative and categorical data, \citep{Srikant1996} gives a useful description on how such values can be mapped onto the
+binary (or boolean) problem space.
+
+\citet{Hahsler2007} presents a package for the R software environment used in statistical computing, which implements a base
+for transaction databases as well as integration with two of the most common mining algorithms, Apriori and Eclat. One of the
+useful implementation choices is the implementation of the sparse matrix data structure, which greatly reduces memory load.
+
+\section{Suggested thesis topics}
 \begin{itemize}
 	\item Compare the rules in a decision tree with those of an association rule mining algorithm in regard to performance and
 			quality.
 	\item Case-study of the KDD process in online marketing.
 	\item Literature study on the topic of KDD/data mining/decision trees.
-\end{itemize}
-
-\section{Questions}
-\begin{itemize}
-	\item Which parts of the data should be input simultanously? Including a new campaign in a data set of long-running
-		campaigns will most likely lead to a very low support for any identified rule. The problem with applying the algorithm
-		on only one campaign at a time is that broader rules might not be identified.
+	\item Study the process of selecting input data in regard to the expected outcome, comparing the differences between small,
+			targeted input sets and broad, general dittos. If a lot of data yield better results, can they be cached and updated
+			incrementally?
+	\item Modify an existing algorithm to use the metrics already related to the input data to make the calculations more
+			effecient.
+	\item Discuss the usefulness of heuristics to increase efficiency, while only negligibly decreasing accuracy.
 \end{itemize}
 
 \section{Project plan}
-The proposed workflow of this thesis is inspired by the agile practices that perhaps most notably have become
-common in the software development industry. The most important methods that should be applied to this work are
-iterative project development and frequent ``customer collaboration'', in this case thesis suporvisors from both
-Chalmers University of Technology and Duego Technologies AB.
+The proposed workflow of this thesis is inspired by the agile practices that perhaps most notably have become common in the
+software development industry. The most important methods that should be applied to this work are iterative project development
+and frequent ``customer collaboration'', in this case thesis suporvisors from both Chalmers University of Technology and Duego
+Technologies AB.
 
-The project is expected to run for about 20 weeks. By dividing this relatively long period of time into iterations
-of 1--3 weeks, the project will be easier both to manage from my point of view as well as provide ample opportunity
-for the supervisors to have their feedback incorporated.
+The project is expected to run for about 20 weeks. By dividing this relatively long period of time into iterations of four weeks,
+the project will be easier to manage from my point of view as well as provide ample opportunity for the supervisors to have their
+feedback incorporated.
 
-The initial iteration will most likely require a heavy focus on research and studies of the related fields. The following
-iterations will all include work on the three areas mentioned in section \ref{sec:approach} on page \pageref{sec:approach}.
-Once the research has progressed to an extent that the problem space as well as the approach of the solution are well defined,
-more effort can be put into the development of the final application that is to be used by Duego.
+The initial iterations will most likely require a heavy focus on research and studies of the related fields. The following
+iterations will include more work on the practical side of the projects. Once the research has progressed to an extent that the
+problem space as well as the approach of the solution are well defined, more effort can be put into the development of the final
+application that is to be used by Duego. A preliminary list of milestones are listed below.
+
+\begin{enumerate}
+	\item Finish extended proposal (June 19)
+	\item Research problem is to be well-defined and theoretical solution described (July 17)
+	\item Demo a prototype of the final system (August 14)
+	\item Research should be finalized and draft of final paper submitted to supervisors (September 11)
+	\item Submit final paper to examinator and working system to Duego (October 9)
+\end{enumerate}
+
+\section{Verification}
+The result of the thesis work would be verified by applying the results to the problem suggested by Duego in a real-world setting.
+The suggested advertisement and target groups from the system will be added to their online marketing portfolio which will allow
+us to analyze the effectiveness of the software. This can be done continuously over the course of the development in addition to
+more traditional software unit and system testing.
 
 \section{Thesis outline}
-Todo
-
-\section{Original proposal}
-
-\subsection{Problem}
-The problem statement given in the background section is described from the view of Duego, however it can be generalized into
-a much more general problem in the sphere of software engineering.
-
-Firstly, the terms entity, entity group and metrics need to be defined. An entity is something that has distinct properties
-that enables it to be compared to other entities. As such, entities do not have to be unique, and two separate entities are
-further defined to be equal if they share the same properties of which the corresponding values are equal.
-
-An entity group is the set of all entities that share one or more defined property values as given by the group definition.
-In object-oriented terms, an entity group would be a class where as entities are instances of classes (i.e. objects). Metrics
-is by definition a specific entity group, however for the sake of clarity I have chosen not to refer to it as such, as it is
-considered such an important concept in the problem statement.
-
-By analyzing entities that belong to separate entity groups, I wish to identify correlations between unique properties of
-these with the goal of maximizing the appropriate metrics. Metrics are in turn measured for each combination of two entities
-that are not of the same type. The expected input to the resulting system are entities and their metrics which should yield
-an output of new combinations consisting of either already existing entities or suggested new entities.
-
-The most prominent problem to be solved is how to design an algorithm that can efficiently calculate these correlations for
-large amounts of data. The data set that will be used in production consists of tens of millions of these entities, which
-means hundreds of millions of properties that should be correlated. Such data sizes can generally not be handled using
-ordinary brute-force-type algorithms, but requires some form of heuristics to increase efficiency while decreasing accuracy.
-Another expected requirement is to not have to run all previous data through the system each time, but rather caching results
-and improving them incrementally.
-
-\subsection{Relevance}
-The requirements discussed in the problem description are closely related to both the field of machine learning as well as
-that of algorithms and algorithm design, meaning that the final product will most likely have to incorporate strategies from
-both fields.
-
-\subsection{Approach}
-\label{sec:approach}
-The general problem can be divided into three subtasks that need to be completed in order to create a system that fulfill the
-defined requirements.
 \begin{itemize}
-	\item Create a domain specific language (DSL) for specifying the desired entity groups, their relations and which
-	properties to optimize
-	\item Design algorithm for optimizing the defined task which can be proven to provide output of high quality
-	\item Extend system with machine learning methods to increase data handling capabilities without causing output quality to
-	 drop below reasonable thresholds
+	\item Abstract (0.5 pages)
+	\item Introduction (1 page)
+	\item Related work (1 page)
+	\item ... (Depends on the thesis topic)
+	\item Discussion (1-2 pages)
+	\item Conclusion (1 page)
 \end{itemize}
-Since the general solution to the problem will simultaneously be applied to a specific problem area (described in the
-background), the definitions of quality are based on customer expectations. As such, it is recommended that the thesis work is
-performed using an agile approach to maximize the impact of input from supervisors both at Duego as well as Chalmers University
-of Technology.
-
-\subsection{Verification}
-The result of the thesis work would be verified by applying the results to the problem suggested by Duego in a real-world setting.
- The suggested advertisement and target groups from the system will be added to Facebook which will allow us to analyze the
- effectiveness of the software. This can be done continuously over the course of the development in addition to more traditional
- software unit and system testing.
 
 \bibliographystyle{plainnat}
 \bibliography{references} % references.bib
