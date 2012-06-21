@@ -13,9 +13,9 @@
 \maketitle
 
 \section{Introduction}
-Duego was founded in 2010 with the idea of creating a social networking site that would target people who wanted to meet new
-people. This stands in contrast to the existing networks that either manage people who the user already know (e.g. Facebook)
-or where the user try to find a life partner (i.e. dating sites). Online advertisement is leveraged as a way to promote the
+Duego was founded in 2010 with the idea of creating a social networking site whose target group is those who wish to meet new
+people. This stands in contrast to the existing networks that either manage people who the user already knows (e.g. Facebook)
+or where the user tries to find a life partner (i.e. dating sites). Online advertisement is leveraged as a way to promote the
 site to new users. This is done both using targeted ads that are adapted based on the target demographics on social networks,
 as well as more conventional ads on websites. Today, managing these campaigns is a manual process that is outsourced to
 another company.
@@ -39,9 +39,12 @@ loop is divided into four sub-tasks called monitor (collect system information),
 (design behaviour required to reach goal) and execute (run the planned actions), sometimes refered to as MAPE.
 
 Using this framework, only the analysis and planning tasks are considered part of this paper, where as monitoring and execution
-is out of scope. The latter two are however relevant in the verification step, but will not be covered as a research topic. In
+are out of scope. The latter two are however relevant in the verification step, but will not be covered as a research topic. In
 this context, this means for example that the feature of integrating this system with marketing services to automatically add new
 ads and campaigns will not be a part of the final system.
+
+Furthermore, the data set includes attributes whose values are free text and images. Text mining and image recognition is beyond
+the scope of this project. Instead these attributes will be manually categorized, so that the value space is discrete and finite.
 
 \section{Foundations}
 A number of high-level descriptions of frameworks for knowledge discovery in databases exist \citep{Fayyad1996, Frawley1992}
@@ -57,7 +60,8 @@ be a column \citep{Witten2011}.
 
 The Weka Project has defined an input format to be used for their open source data mining software called ARFF (Attribute-Relation
 File Format) \citep{Garner1995, Witten2011}. This format is used by the Weka software package, but is well-defined and can be used
-as the input format for custom systems as well.
+as the input format for custom systems as well. \citet{Witten2011} also describe how to use implementations of Weka in custom
+software projects as well as how to extend the system with new functionality.
 
 In a highly influential paper, \citet{Quinlan1986} decribe how decision trees can be created from a training set and how well it
 handles the problem of unknown attributes values and noisy data. A related paper, \citet{Quinlan1987}, deal with how generated
@@ -65,6 +69,17 @@ decision trees can be simplified in order to more easily be applied. Four differ
 reformulation of the tree as a set of production rules. This specific topic is further analyzed in \citet{Quinlan1987b} where such
 production rules are shown to be more compact and also in many cases improve the classification of unseen data. An added positive
 effect is that production rules from separate classifications can be merged more efficiently than their original decision trees.
+
+Standard decision trees give a best-effort boolean classification of the input data, however sometimes it might be more
+appropriate to give the probability that the input belongs to each of the available classes. This can be described using
+probability estimation trees (PETs). \citet{Provost2003} discuss the problems of estimating these probabilities from ordinary
+decision trees and goes on to show how to increase the accuracy of the estimates by performing tree pruning more conservately and
+by applying the Laplace correction.  They also show that probability-bagging, meaning the combination of results from multiple
+classifiers instead of just the one, greatly improves the estimates. The suggested algorithm, called C4.4, is part of a
+comparative study of PETs by \citet{Chu2011} and is shown to have an impressive accuracy, though other algorithms may still be
+more appropriate. A likely candidate algorithm for this thesis is the Naive Bayes tree, which is a standard decision tree with the
+difference that the leaves are Naive Bayes classifiers, providing probabilities that an instance belong to each of the available
+classes.
 
 A thorough literature study on domain-specific languages is covered by \citet{Deursen2000} and covers high-level topics, such as
 potential benefits and risks of using DSLs and exemplifying with a number of languages from different areas. The article also
@@ -81,7 +96,7 @@ bread, however purchasing milk of any kind may still be correlated to the purcha
 A related area in data mining is association rule learning. \citet{Agrawal1993} describe how, given a large set of
 transactions containing any number of different items, rules can be identified between these items. In the case of commerce,
 such rules would describe how the purchase of one product would, with a probability above a certain threshold, also infer
-the purchase of another product. This method could be applicable for the problem in this paper, even though it is more of a
+the purchase of another product. This method could be applicable to the problem in this paper, even though it is more of a
 classification problem, and some of the necessary extensions of the method are mentioned below.
 
 \citet{Srikant1997} expands the above research by applying contraints on the items in the resulting association rules. These
@@ -101,6 +116,7 @@ useful implementation choices is the implementation of the sparse matrix data st
 
 \section{Suggested thesis topics}
 \begin{itemize}
+	\item Define data mining algorithm for generating decision rules of binary classes with probabilities
 	\item Compare the rules in a decision tree with those of an association rule mining algorithm in regard to performance and
 			quality.
 	\item Case-study of the KDD process in online marketing.
