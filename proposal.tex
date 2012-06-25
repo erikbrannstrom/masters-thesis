@@ -3,6 +3,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{natbib}
+\usepackage{graphicx}
+\graphicspath{{./images/}}
 
 \begin{document}
 
@@ -26,22 +28,53 @@ use this data to suggest, or even automatically add, new campaign ads. The data 
 hundreds of different campaigns, each with a large number of ads. Along with the attributes of both campaigns and ads, this means
 that the complete advertisement data set consists of hundreds of thousands of attributes to be analyzed.
 
+\section{Problem}
 This problem statement is described from the view of Duego, however it can be generalized into a broader problem in the sphere of
 software engineering, namely knowledge discovery in databases (KDD) or more specifically data mining. Data mining is the process
 of delegating and automating the task of identifying useful knowledge in a large set of data to a computer, either fully or
 partially. The somewhat philosophical discussion of what knowledge really is and how to define what is useful knowledge will not,
 however, be covered in this paper.
 
-\section{Scope}
-Useful terminology is defined by \citet{IBM2006} in the field of autonomic computing. An autonomic manager is a component that
-collects data from a system and, based on this data, performs actions with the purpose of improving the system. This control
-loop is divided into four sub-tasks called monitor (collect system information), analyze (correlate and model data), plan
-(design behaviour required to reach goal) and execute (run the planned actions), sometimes refered to as MAPE.
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.7\textwidth]{mape.eps}
+\caption{General MAPE control loop}
+\label{fig:MAPE}
+\end{figure}
 
-Using this framework, only the analysis and planning tasks are considered part of this paper, where as monitoring and execution
-are out of scope. The latter two are however relevant in the verification step, but will not be covered as a research topic. In
-this context, this means for example that the feature of integrating this system with marketing services to automatically add new
-ads and campaigns will not be a part of the final system.
+Useful terminology is defined by \citet{IBM2006} in the field of autonomic computing. Figure \ref{fig:MAPE} shows an autonomic
+manager, which is a component that collects data from a system and, based on this data, performs actions with the purpose of 
+improving the system. This control loop is divided into four sub-tasks called monitor (collect system information), analyze 
+(correlate and model data), plan (design behaviour required to reach goal) and execute (run the planned actions), sometimes 
+refered to as MAPE.
+
+In online marketing, monitoring is the collection of metrics for online advertisement. To optimize these metrics, the gathered 
+information is analyzed and this analysis forms the basis for the planning of future campaigns. Once the plans are completed, the 
+new campaign can be launched, with new metrics being gathered and so on.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.7\textwidth]{mape-marketing.eps}
+\caption{Online marketing automation system in control loop}
+\label{fig:MAPEMarketing}
+\end{figure}
+
+Today only the monitoring is automated, where as the other parts of the process are performed manually. It is infeasible to fully
+automate the whole process, due to for example the creative side of advertisement and the complex factors that decide which groups
+an upcoming campaign should target. There are however certain areas that can be automated and this paper will focus on automated
+analysis and planning of online marketing campaigns, shown in Figure \ref{fig:MAPEMarketing}.
+
+A system to automate this process would require monitored data as input, which in this context equals historical data of campaigns
+and their metrics as mentioned previously. This data would then be mined to identify subsets of campaign properties that are 
+associated with a probability that an impression of that an ad with these properties leads to an action being taken by the user.
+Human input is required to specify which target group the next campaign will be aimed at, and based on this the system will 
+generate suggested ad properties that optimize the number of expected actions taken per impression.
+
+\section{Scope}
+Using the MAPE framework in Figure \ref{fig:MAPE}, only the analysis and planning tasks are considered part of this paper, where 
+as monitoring and execution are out of scope. The latter two are however relevant in the verification step, but will not be 
+covered as a research topic. In this context, this means for example that the feature of integrating this system with marketing 
+services to automatically add new ads and campaigns will not be a part of the final system.
 
 Furthermore, the data set includes attributes whose values are free text and images. Text mining and image recognition is beyond
 the scope of this project. Instead these attributes will be manually categorized, so that the value space is discrete and finite.
@@ -114,21 +147,6 @@ binary (or boolean) problem space.
 for transaction databases as well as integration with two of the most common mining algorithms, Apriori and Eclat. One of the
 useful implementation choices is the implementation of the sparse matrix data structure, which greatly reduces memory load.
 
-\section{Suggested thesis topics}
-\begin{itemize}
-	\item Define data mining algorithm for generating decision rules of binary classes with probabilities
-	\item Compare the rules in a decision tree with those of an association rule mining algorithm in regard to performance and
-			quality.
-	\item Case-study of the KDD process in online marketing.
-	\item Literature study on the topic of KDD/data mining/decision trees.
-	\item Study the process of selecting input data in regard to the expected outcome, comparing the differences between small,
-			targeted input sets and broad, general dittos. If a lot of data yield better results, can they be cached and updated
-			incrementally?
-	\item Modify an existing algorithm to use the metrics already related to the input data to make the calculations more
-			effecient.
-	\item Discuss the usefulness of heuristics to increase efficiency, while only negligibly decreasing accuracy.
-\end{itemize}
-
 \section{Project plan}
 The proposed workflow of this thesis is inspired by the agile practices that perhaps most notably have become common in the
 software development industry. The most important methods that should be applied to this work are iterative project development
@@ -161,11 +179,16 @@ more traditional software unit and system testing.
 \section{Thesis outline}
 \begin{itemize}
 	\item Abstract (0.5 pages)
-	\item Introduction (1 page)
-	\item Related work (1 page)
-	\item ... (Depends on the thesis topic)
-	\item Discussion (1-2 pages)
-	\item Conclusion (1 page)
+	\item Introduction (0.5 pages)
+	\item Problem description (1-2 pages)
+	\item Related works (1 page)
+	\item Solution (3-4 pages)
+	\begin{itemize}
+		\item Analysis step
+		\item Planning step
+	\end{itemize}
+	\item Discussion (1 page)
+	\item Conclusion (0.5 pages)
 \end{itemize}
 
 \bibliographystyle{plainnat}
