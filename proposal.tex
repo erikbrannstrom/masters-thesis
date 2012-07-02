@@ -147,6 +147,30 @@ binary (or boolean) problem space.
 for transaction databases as well as integration with two of the most common mining algorithms, Apriori and Eclat. One of the
 useful implementation choices is the implementation of the sparse matrix data structure, which greatly reduces memory load.
 
+\section{Solution}
+The solution has been divided into one section each for the two subtasks identified in the problem description. Analysis covers
+the problem of creating an appropriate model of the available data that can be used in the next stage. Planning, in turn, is the 
+utilization of that model with the purpose of outputting useful information to the operator.
+
+\subsection{Analysis}
+The natural distribution of the input data is very uneven because the number of impressions required to receive a click is high.
+Consider the scenario of a click-through rate (CTR) of 1\%, which means that for every 100 impressions there would on average be one
+click. The simplest possible classification rule would be a rule that for every instance gives the classification of no click, and
+this would yield an accuracy of 99\%. Even though this is indeed an impressive number, it is of no use to us since it says nothing
+about the instances that actually would yield clicks. This is refered to as the problem of imbalanced data sets as described by
+\citet{Chawla2004}.
+
+One way to deal with this problem is to increase the number of instances that we are interested in (positive instances) or 
+decreasing the number of negative instances in so that the total distribution is even. This is called over-sampling and under-
+sampling respectively, and will remove the possibility for a classifier to simply disregard the positive instances in the 
+classification \citep{Chawla2004, Japkowicz2002}.
+
+A second alternative is to use the concept of cost modification, i.e. tell the algorithm that it is more costly to misclassify
+positive instances as negative instances than vice versa \citep{Chawla2004, Japkowicz2002}.
+
+A third option is to not consider the class to be click/no click, but rather set a threshold rate for the CTR and let the top 50\%
+be classified as high-performing ads and vice versa.
+
 \section{Project plan}
 The proposed workflow of this thesis is inspired by the agile practices that perhaps most notably have become common in the
 software development industry. The most important methods that should be applied to this work are iterative project development
