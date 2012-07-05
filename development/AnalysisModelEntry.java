@@ -60,6 +60,25 @@ public class AnalysisModelEntry implements Iterable<AttributeRule>
 		return true;
 	}
 
+	/**
+	 * Remove rules that do not add information, e.g. rule set
+	 * x > 3 & x > 5 can be simplified to x > 5.
+	 */
+	public void removeRedundancy()
+	{
+		List<AttributeRule> modifiedData = new LinkedList<AttributeRule>(this.data);
+		for (AttributeRule rule1 : this.data) {
+			for (AttributeRule rule2 : this.data) {
+				if (rule1 == rule2) {
+					continue;
+				} else if (rule1.coveredBy(rule2)) {
+					modifiedData.remove(rule2);
+				}
+			}
+		}
+		this.data = modifiedData;
+	}
+
 	public String toString()
 	{
 		StringBuffer buffer = new StringBuffer();

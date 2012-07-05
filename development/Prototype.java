@@ -94,6 +94,7 @@ public class Prototype
 						entry.add(new AttributeRule(att, r));
 					}
 				String[] measureSplit = splitClass[1].replaceAll("[()]", "").split("/");
+				entry.removeRedundancy();
 				model.add(entry, (1.0-Double.valueOf(measureSplit[1]) / Double.valueOf(measureSplit[0])));
 			}
 		}

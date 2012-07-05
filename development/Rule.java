@@ -146,7 +146,6 @@ public class Rule
 				}
 			}
 		}
-		System.out.println("Unsuccessful evaluation in coveredBy.");
 		return false;
 	}
 
