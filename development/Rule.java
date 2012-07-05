@@ -1,39 +1,74 @@
-
-
+import java.util.List;
+/**
+ * General description of a rule.
+ *
+ * A rule is either a single value and its comparator.
+ */
 public class Rule
 {
-	public enum Comparator { EQUAL, LESS_THAN, GREATER_THAN }
+	public enum Comparator {
+		EQUAL ("="),
+		NOT_EQUAL ("!="),
+		LESS_THAN ("<"),
+		LESS_THAN_OR_EQUAL ("<="),
+		GREATER_THAN (">"),
+		GREATER_THAN_OR_EQUAL (">=");
 
-	private Attribute attribute;
+		private String display;
+
+		Comparator(String display) {
+			this.display = display;
+		}
+
+		public String toString()
+		{
+			return this.display;
+		}
+
+		public static Comparator fromString(String comp)
+		{
+			for (Comparator c : Comparator.values()) {
+				if (c.toString().equals(comp)) {
+					return c;
+				}
+			}
+			return null;
+		}
+	}
+
 	private Object value;
-	private Object classValue;
 	private Comparator comparator;
 
-	public Rule(Attribute attribute, Object value, Object classValue, Rule.Comparator comparator)
+	public Rule(Object value, Rule.Comparator comparator)
 	{
-		if (comparator != Rule.Comparator.EQUAL && !(value instanceof Comparable)) {
+		if (comparator != Rule.Comparator.EQUAL && comparator != Rule.Comparator.NOT_EQUAL && !(value instanceof Comparable)) {
 			throw new IllegalArgumentException("For less/greater than, attribute must be comparable.");
 		}
-		this.attribute = attribute;
 		this.value = value;
-		this.classValue = classValue;
 		this.comparator = comparator;
 	}
 
-	public Rule(Attribute attribute, Object value, Object classValue)
+	public Rule(Object value)
 	{
-		this(attribute, value, classValue, Rule.Comparator.EQUAL);
+		this(value, Rule.Comparator.EQUAL);
 	}
 
-	public boolean match(Instance instance)
+	public Object value()
 	{
-		return this.match(instance.attributeValue(this.attribute));
+		return this.value;
+	}
+
+	public Rule.Comparator comparator()
+	{
+		return this.comparator;
 	}
 
 	public boolean match(Object obj)
 	{
 		if (this.comparator == Rule.Comparator.EQUAL) {
 			return value.equals(obj);
+		} else if (this.comparator == Rule.Comparator.NOT_EQUAL) {
+			return !value.equals(obj);
 		}
 		if (! (obj instanceof Comparable)) {
 			throw new IllegalArgumentException();
@@ -41,42 +76,87 @@ public class Rule
 
 		// We have already thrown an exception in case the values are not comparable
 		@SuppressWarnings("unchecked")
-		Comparable<Object> instanceValue = (Comparable<Object>)obj;
+		Comparable<Object> compareValue = (Comparable<Object>)obj;
 		@SuppressWarnings("unchecked")
 		Comparable<Object> ruleValue = (Comparable<Object>)this.value;
 
-		if (this.comparator == Rule.Comparator.LESS_THAN) {
-			return instanceValue.compareTo(ruleValue) < 0;
-		} else {
-			return instanceValue.compareTo(ruleValue) > 0;
+		switch (this.comparator) {
+			case LESS_THAN:
+				return compareValue.compareTo(ruleValue) < 0;
+			case LESS_THAN_OR_EQUAL:
+				return compareValue.compareTo(ruleValue) <= 0;
+			case GREATER_THAN:
+				return compareValue.compareTo(ruleValue) > 0;
+			case GREATER_THAN_OR_EQUAL:
+				return compareValue.compareTo(ruleValue) >= 0;
 		}
+
+		return false;
 	}
 
-	public Object classValue()
+	public boolean coveredBy(Rule rule)
 	{
-		return this.classValue;
+		if (! (this.value instanceof Comparable)) {
+			// Non-comparable values
+			if (this.comparator() == Comparator.EQUAL && rule.comparator() == Comparator.EQUAL) {
+				return this.value().equals(rule.value());
+			} else if (this.comparator() == Comparator.NOT_EQUAL && rule.comparator() == Comparator.NOT_EQUAL) {
+				return !this.value().equals(rule.value());
+			} else {
+				return false;
+			}
+		} else {
+			// Comparable values
+			@SuppressWarnings("unchecked")
+			Comparable<Object> ruleValue = (Comparable<Object>)rule.value();
+			@SuppressWarnings("unchecked")
+			Comparable<Object> value = (Comparable<Object>)this.value;
+
+			if (this.comparator() == Comparator.EQUAL) {
+				return rule.match(value);
+			} else if (this.comparator() == Comparator.NOT_EQUAL) { 
+				return !this.value().equals(ruleValue);
+			} else if (this.comparator() == Comparator.LESS_THAN) {
+				if (rule.comparator() == Comparator.LESS_THAN || rule.comparator() == Comparator.LESS_THAN_OR_EQUAL) {
+					return value.compareTo(ruleValue) <= 0;
+				} else {
+					return false;
+				}
+			} else if (this.comparator() == Comparator.LESS_THAN_OR_EQUAL) {
+				if (rule.comparator() == Comparator.LESS_THAN) {
+					return value.compareTo(ruleValue) < 0;
+				} else if (rule.comparator() == Comparator.LESS_THAN_OR_EQUAL) {
+					return value.compareTo(ruleValue) <= 0;
+				} else {
+					return false;
+				}
+			} else if (this.comparator() == Comparator.GREATER_THAN) {
+				if (rule.comparator() == Comparator.GREATER_THAN || rule.comparator() == Comparator.GREATER_THAN_OR_EQUAL) {
+					return value.compareTo(ruleValue) >= 0;
+				} else {
+					return false;
+				}
+			} else if (this.comparator() == Comparator.GREATER_THAN_OR_EQUAL) {
+				if (rule.comparator() == Comparator.GREATER_THAN) {
+					return value.compareTo(ruleValue) > 0;
+				} else if (rule.comparator() == Comparator.GREATER_THAN_OR_EQUAL) {
+					return value.compareTo(ruleValue) >= 0;
+				} else {
+					return false;
+				}
+			}
+		}
+		System.out.println("Unsuccessful evaluation in coveredBy.");
+		return false;
 	}
 
-	public Attribute attribute()
-	{
-		return this.attribute;
-	}
-
+	/**
+	 * Returns a string representation of the rule.
+	 */
 	public String toString()
 	{
 		StringBuffer buffer = new StringBuffer();
-		buffer.append(this.attribute.toString());
-		switch (this.comparator) {
-			case EQUAL:
-				buffer.append("="); break;
-			case LESS_THAN:
-				buffer.append("<"); break;
-			case GREATER_THAN:
-				buffer.append(">"); break;
-		}
-		buffer.append(value.toString());
-		buffer.append(" -> ");
-		buffer.append(this.classValue.toString());
+		buffer.append(this.comparator.toString()).append(" ").append(this.value.toString());
 		return buffer.toString();
 	}
 

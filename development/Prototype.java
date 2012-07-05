@@ -25,7 +25,25 @@ public class Prototype
 			System.exit(-1);
 		}
 
-		// Set class attribute if not already set
+		// Create list of attribute objects that are not using Weka's class
+		weka.core.Attribute wekaAttribute = null;
+		List<Attribute> attributeList = new LinkedList<Attribute>();
+
+		for (int i = 0; i < data.numAttributes(); i++) {
+			wekaAttribute = data.attribute(i);
+			if (wekaAttribute.type() == weka.core.Attribute.NOMINAL) {
+				List<String> possibleValues = new LinkedList<String>();
+				for (int j = 0; j < wekaAttribute.numValues(); j++) {
+					possibleValues.add(wekaAttribute.value(j));
+				}
+				attributeList.add(new NominalAttribute(wekaAttribute.name(), possibleValues));
+			} else {
+				attributeList.add(new NumericAttribute(wekaAttribute.name(), 
+					data.kthSmallestValue(wekaAttribute, 1), data.kthSmallestValue(wekaAttribute, data.numInstances())));
+			}
+		}
+
+		// Set class attribute if not already set, assumed to be the last
 		if (data.classIndex() == -1) {
 		   data.setClassIndex(data.numAttributes() - 1);
 		}
@@ -49,8 +67,7 @@ public class Prototype
 
 		// Parse string of classification rules
 		String[] rules = csc.toString().split("\n\n");
-		List<List<String>> positiveRules = new LinkedList<List<String>>();
-		List<Double> errorRates = new LinkedList<Double>();
+		AnalysisModel model = new AnalysisModel();
 
 		for (String rule : rules) {
 			String[] split = rule.split(":");
@@ -60,34 +77,84 @@ public class Prototype
 			String[] splitClass = split[1].trim().split(" ");
 			if (splitClass[0].equalsIgnoreCase("yes")) {
 				List<String> subRules = Arrays.asList(split[0].replaceAll("\n", " ").split(" AND "));
-				positiveRules.add(new LinkedList<String>(subRules));
-				//positiveRules.get(positiveRules.size()-1).add("Click = " + splitClass[0]);
+					AnalysisModelEntry entry = new AnalysisModelEntry();
+					for (String subrule : subRules) {
+						String[] ruleComponents = subrule.split(" ");
+						Attribute att = new Attribute(ruleComponents[0]);
+			
+						Rule r = null;
+						if (ruleComponents[2].matches("-?\\d+")) {
+							r = new Rule(new Integer(ruleComponents[2]), Rule.Comparator.fromString(ruleComponents[1]));
+						} else if (ruleComponents[2].matches("-?\\d+(.\\d+)?")) {
+							r = new Rule(new Double(ruleComponents[2]), Rule.Comparator.fromString(ruleComponents[1]));
+						} else {
+							r = new Rule(ruleComponents[2], Rule.Comparator.fromString(ruleComponents[1]));
+						}
+
+						entry.add(new AttributeRule(att, r));
+					}
 				String[] measureSplit = splitClass[1].replaceAll("[()]", "").split("/");
-				errorRates.add(Double.valueOf(measureSplit[1]) / Double.valueOf(measureSplit[0]));
+				model.add(entry, (1.0-Double.valueOf(measureSplit[1]) / Double.valueOf(measureSplit[0])));
 			}
 		}
 
-		String[] requirements = null;
-		if (args.length > 1) {
-			requirements = Arrays.copyOfRange(args, 1, args.length);
+		model.sort(new Comparator<Pair<AnalysisModelEntry, Double>>() {
+			public int compare(Pair<AnalysisModelEntry, Double> o1, Pair<AnalysisModelEntry, Double> o2) {
+				if (o1.equals(o2)) {
+					return 0;
+				} else if (o1.second() - o2.second() < 0) {
+					return 1;
+				} else {
+					return -1;
+				}
+			}
+		});
+
+		//System.out.println(model.toString());
+		System.out.println("Available attributes:");
+		for (Attribute ar : attributeList) {
+			System.out.println(ar);
+		}
+		System.out.println("Enter one rule per line, finish with q + ENTER:");
+		Scanner in = new Scanner(System.in);
+
+		// Reads a single line from the console 
+		// and stores into name variable
+		List<AttributeRule> targetRules = new LinkedList<AttributeRule>();
+		while (in.hasNextLine()) {
+			String rule = in.nextLine();
+			if (rule.equalsIgnoreCase("q")) {
+				break;
+			}
+			String[] parsedRule = rule.split(" ");
+			if (parsedRule.length != 3 || Rule.Comparator.fromString(parsedRule[1]) == null) {
+				System.out.println("Incorrectly formated rule, exiting.");
+				in.close();
+				System.exit(-1);
+			}
+
+			Rule r = null;
+			if (parsedRule[2].matches("-?\\d+")) {
+				r = new Rule(new Integer(parsedRule[2]), Rule.Comparator.fromString(parsedRule[1]));
+			} else if (parsedRule[2].matches("-?\\d+(.\\d+)?")) {
+				r = new Rule(new Double(parsedRule[2]), Rule.Comparator.fromString(parsedRule[1]));
+			} else {
+				r = new Rule(parsedRule[2], Rule.Comparator.fromString(parsedRule[1]));
+			}
+			targetRules.add(new AttributeRule(new Attribute(parsedRule[0]), r));
 		}
 
-		// Print in order of lowest error rate
-		List<Double> sortedErrorRates = new LinkedList<Double>(errorRates);
-		Collections.sort(sortedErrorRates);
-		for (int i = 0; i < sortedErrorRates.size(); i++) {
-			int index = errorRates.indexOf(sortedErrorRates.get(i));
-			List<String> tmp = positiveRules.get(index);
-			// Limit to those rules which fulfil the requirements specified in args, if any
-			if (requirements != null && !tmp.containsAll(Arrays.asList(requirements))) {
-				continue;
-			}
-			if (tmp.size() > 1) {
-				double err = Math.round(errorRates.get(index)*10000)/100.0;
-				System.out.print(tmp.toString() + " (" + err + "%)\n");
+		in.close();
+
+		System.out.println(targetRules);
+
+		for (int i = 0; i < model.size(); i++) {
+			AnalysisModelEntry entry = model.getEntry(i);
+			if (entry.matchedBy(targetRules)) {
+				double rate = Math.round(model.getSuccessRate(entry)*10000)/100.0;
+				System.out.println(entry + " (" + rate + "%)");
 			}
 		}
-
 	}
 
 }

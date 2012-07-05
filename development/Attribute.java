@@ -2,12 +2,10 @@
 public class Attribute
 {
 	private String name;
-	private Class<?> type;
 
-	public Attribute(String name, Class<?> type)
+	public Attribute(String name)
 	{
 		this.name = name;
-		this.type = type;
 	}
 
 	public String name()
@@ -15,9 +13,21 @@ public class Attribute
 		return this.name;
 	}
 
-	public Class<?> type()
+	/**
+	 * Check whether or not an object is a valid value for this attribute type.
+	 */
+	//public abstract boolean validate(Object value);
+
+	/**
+	 * Attributes are uniquely identified by their name.
+	 */
+	public boolean equals(Object obj)
 	{
-		return this.type;
+		if (obj instanceof Attribute) {
+			return ((Attribute)obj).name().equals(this.name());
+		} else {
+			return false;
+		}
 	}
 
 	public String toString()
