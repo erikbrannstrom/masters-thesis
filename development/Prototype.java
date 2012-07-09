@@ -38,7 +38,7 @@ public class Prototype
 				}
 				attributeList.add(new NominalAttribute(wekaAttribute.name(), possibleValues));
 			} else {
-				attributeList.add(new NumericAttribute(wekaAttribute.name(), 
+				attributeList.add(new NumericAttribute(wekaAttribute.name(),
 					data.kthSmallestValue(wekaAttribute, 1), data.kthSmallestValue(wekaAttribute, data.numInstances())));
 			}
 		}
@@ -52,6 +52,7 @@ public class Prototype
 		CostSensitiveClassifier csc = new CostSensitiveClassifier();
 		CostMatrix costMatrix = new CostMatrix(2);
 		costMatrix.setElement(0, 1, 1.0);
+		// TODO: Calculate this automatically from set of instances
 		costMatrix.setElement(1, 0, 2500.0);
 		csc.setCostMatrix(costMatrix);
 		PART part = new PART();
@@ -81,7 +82,7 @@ public class Prototype
 					for (String subrule : subRules) {
 						String[] ruleComponents = subrule.split(" ");
 						Attribute att = new Attribute(ruleComponents[0]);
-			
+
 						Rule r = null;
 						if (ruleComponents[2].matches("-?\\d+")) {
 							r = new Rule(new Integer(ruleComponents[2]), Rule.Comparator.fromString(ruleComponents[1]));
@@ -94,8 +95,12 @@ public class Prototype
 						entry.add(new AttributeRule(att, r));
 					}
 				String[] measureSplit = splitClass[1].replaceAll("[()]", "").split("/");
+				double misclassified = Double.valueOf(measureSplit[1]);
+				double covered = Double.valueOf(measureSplit[0]);
+				double correctlyClassified = (covered-misclassified)/2500.0;
+				double ratio = correctlyClassified/(misclassified+correctlyClassified);
 				entry.removeRedundancy();
-				model.add(entry, (1.0-Double.valueOf(measureSplit[1]) / Double.valueOf(measureSplit[0])));
+				model.add(entry, ratio);
 			}
 		}
 
@@ -111,7 +116,6 @@ public class Prototype
 			}
 		});
 
-		//System.out.println(model.toString());
 		System.out.println("Available attributes:");
 		for (Attribute ar : attributeList) {
 			System.out.println(ar);
@@ -119,7 +123,7 @@ public class Prototype
 		System.out.println("Enter one rule per line, finish with q + ENTER:");
 		Scanner in = new Scanner(System.in);
 
-		// Reads a single line from the console 
+		// Reads a single line from the console
 		// and stores into name variable
 		List<AttributeRule> targetRules = new LinkedList<AttributeRule>();
 		while (in.hasNextLine()) {
@@ -147,12 +151,10 @@ public class Prototype
 
 		in.close();
 
-		System.out.println(targetRules);
-
 		for (int i = 0; i < model.size(); i++) {
 			AnalysisModelEntry entry = model.getEntry(i);
 			if (entry.matchedBy(targetRules)) {
-				double rate = Math.round(model.getSuccessRate(entry)*10000)/100.0;
+				double rate = Math.round(model.getSuccessRate(entry)*100000)/1000.0;
 				System.out.println(entry + " (" + rate + "%)");
 			}
 		}
