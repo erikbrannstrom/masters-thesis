@@ -81,6 +81,10 @@ public class AnalysisModelEntry implements Iterable<AttributeRule>
 
 	public String toString()
 	{
+		if (this.data.size() == 0) {
+			return "Empty";
+		}
+		
 		StringBuffer buffer = new StringBuffer();
 		for (AttributeRule attRule : this.data) {
 			buffer.append(attRule.toString()).append(" & ");

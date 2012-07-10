@@ -7,6 +7,7 @@ import weka.core.converters.ConverterUtils.DataSource;
 
 public class Prototype
 {
+	private static double YES_WEIGHT = 2500.0;
 
 	public static void main(String[] args)
 	{
@@ -24,6 +25,31 @@ public class Prototype
 			System.out.println("Could not read from file " + args[0]);
 			System.exit(-1);
 		}
+
+		// Set class attribute if not already set, assumed to be the last
+		if (data.classIndex() == -1) {
+		   data.setClassIndex(data.numAttributes() - 1);
+		}
+
+		// Find index of yes in class attribute
+		weka.core.Attribute classAttribute = data.classAttribute();
+		int yesValue = 0;
+		for (int i = 0; i < classAttribute.numValues(); i++) {
+			if ("yes".equals(classAttribute.value(i))) {
+				yesValue = i;
+				break;
+			}
+		}
+		
+		// Calculate the weight of class=yes instances
+		double count = 0.0;
+		for (int i = 0; i < data.numInstances(); i++) {
+			weka.core.Instance instance = data.instance(i);
+			if ((int)instance.value(classAttribute) == yesValue) {
+				count += instance.weight();
+			}
+		}
+		YES_WEIGHT = Math.round(data.sumOfWeights()/count)*1.0;
 
 		// Create list of attribute objects that are not using Weka's class
 		weka.core.Attribute wekaAttribute = null;
@@ -43,17 +69,11 @@ public class Prototype
 			}
 		}
 
-		// Set class attribute if not already set, assumed to be the last
-		if (data.classIndex() == -1) {
-		   data.setClassIndex(data.numAttributes() - 1);
-		}
-
 		// Create classifier
 		CostSensitiveClassifier csc = new CostSensitiveClassifier();
 		CostMatrix costMatrix = new CostMatrix(2);
 		costMatrix.setElement(0, 1, 1.0);
-		// TODO: Calculate this automatically from set of instances
-		costMatrix.setElement(1, 0, 2500.0);
+		costMatrix.setElement(1, 0, YES_WEIGHT);
 		csc.setCostMatrix(costMatrix);
 		PART part = new PART();
 		csc.setClassifier(part);
@@ -81,6 +101,9 @@ public class Prototype
 					AnalysisModelEntry entry = new AnalysisModelEntry();
 					for (String subrule : subRules) {
 						String[] ruleComponents = subrule.split(" ");
+						if (ruleComponents.length < 3) {
+							break;
+						}
 						Attribute att = new Attribute(ruleComponents[0]);
 
 						Rule r = null;
@@ -97,7 +120,7 @@ public class Prototype
 				String[] measureSplit = splitClass[1].replaceAll("[()]", "").split("/");
 				double misclassified = Double.valueOf(measureSplit[1]);
 				double covered = Double.valueOf(measureSplit[0]);
-				double correctlyClassified = (covered-misclassified)/2500.0;
+				double correctlyClassified = (covered-misclassified)/YES_WEIGHT;
 				double ratio = correctlyClassified/(misclassified+correctlyClassified);
 				entry.removeRedundancy();
 				model.add(entry, ratio);
