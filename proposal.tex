@@ -28,6 +28,18 @@ use this data to suggest, or even automatically add, new campaign ads. The data 
 hundreds of different campaigns, each with a large number of ads. Along with the attributes of both campaigns and ads, this means
 that the complete advertisement data set consists of hundreds of thousands of attributes to be analyzed.
 
+\section{Terminology}
+A number of marketing terms will be used throughout this paper. A \emph{marketing campaign}, or simply a \emph{campaign},
+is comprised of one or more advertising messages, \emph{ads}, that are directed to one defined audience, the \emph{target} or 
+\emph{target group}. Any ad, and by extension campaign, have numeric measures of success called \emph{metrics}. The most commonly
+used are \emph{impressions}, which is the number of times an ad has been shown, and \emph{clicks}. Ads are limited to include a 
+title, a body text and/or an image, as well as the mandatory URL that a user who clicks the ad will be redirected to. A target
+is defined by demographic data such as age, gender, location or, in the case of for example search engine advertisement, search
+terms.
+
+As the word user is typically used to refer to a person interacting with the web site that is being marketed, we will use the word
+\emph{operator} when discussing a person interacting with the system that is described in this paper to avoid confusion.
+
 \section{Problem}
 This problem statement is described from the view of Duego, however it can be generalized into a broader problem in the sphere of
 software engineering, namely knowledge discovery in databases (KDD) or more specifically data mining. Data mining is the process
@@ -43,13 +55,13 @@ however, be covered in this paper.
 \end{figure}
 
 Useful terminology is defined by \citet{IBM2006} in the field of autonomic computing. Figure \ref{fig:MAPE} shows an autonomic
-manager, which is a component that collects data from a system and, based on this data, performs actions with the purpose of 
-improving the system. This control loop is divided into four sub-tasks called monitor (collect system information), analyze 
-(correlate and model data), plan (design behaviour required to reach goal) and execute (run the planned actions), sometimes 
+manager, which is a component that collects data from a system and, based on this data, performs actions with the purpose of
+improving the system. This control loop is divided into four sub-tasks called monitor (collect system information), analyze
+(correlate and model data), plan (design behaviour required to reach goal) and execute (run the planned actions), sometimes
 refered to as MAPE.
 
-In online marketing, monitoring is the collection of metrics for online advertisement. To optimize these metrics, the gathered 
-information is analyzed and this analysis forms the basis for the planning of future campaigns. Once the plans are completed, the 
+In online marketing, monitoring is the collection of metrics for online advertisement. To optimize these metrics, the gathered
+information is analyzed and this analysis forms the basis for the planning of future campaigns. Once the plans are completed, the
 new campaign can be launched, with new metrics being gathered and so on.
 
 \begin{figure}[h!]
@@ -65,15 +77,15 @@ an upcoming campaign should target. There are however certain areas that can be 
 analysis and planning of online marketing campaigns, shown in Figure \ref{fig:MAPEMarketing}.
 
 A system to automate this process would require monitored data as input, which in this context equals historical data of campaigns
-and their metrics as mentioned previously. This data would then be mined to identify subsets of campaign properties that are 
+and their metrics as mentioned previously. This data would then be mined to identify subsets of campaign properties that are
 associated with a probability that an impression of that an ad with these properties leads to an action being taken by the user.
-Human input is required to specify which target group the next campaign will be aimed at, and based on this the system will 
+Human input is required to specify which target group the next campaign will be aimed at, and based on this the system will
 generate suggested ad properties that optimize the number of expected actions taken per impression.
 
 \section{Scope}
-Using the MAPE framework in Figure \ref{fig:MAPE}, only the analysis and planning tasks are considered part of this paper, where 
-as monitoring and execution are out of scope. The latter two are however relevant in the verification step, but will not be 
-covered as a research topic. In this context, this means for example that the feature of integrating this system with marketing 
+Using the MAPE framework in Figure \ref{fig:MAPE}, only the analysis and planning tasks are considered part of this paper, where
+as monitoring and execution are out of scope. The latter two are however relevant in the verification step, but will not be
+covered as a research topic. In this context, this means for example that the feature of integrating this system with marketing
 services to automatically add new ads and campaigns will not be a part of the final system.
 
 Furthermore, the data set includes attributes whose values are free text and images. Text mining and image recognition is beyond
@@ -147,9 +159,14 @@ binary (or boolean) problem space.
 for transaction databases as well as integration with two of the most common mining algorithms, Apriori and Eclat. One of the
 useful implementation choices is the implementation of the sparse matrix data structure, which greatly reduces memory load.
 
+\citet{Richardson2007} describe a model for predicting the click-through rates of ads given a set of properties in the context
+of search engine advertisement. Though it is a relevant subject, the major difference between such advertisement and that which
+occurs on social networking sites is targeting. Search engines uses keyword matching to select possible ads, i.e. what the user is
+interested in at this moment, where as social networks can uitilize knowledge about who the user is.
+
 \section{Solution}
 The solution has been divided into one section each for the two subtasks identified in the problem description. Analysis covers
-the problem of creating an appropriate model of the available data that can be used in the next stage. Planning, in turn, is the 
+the problem of creating an appropriate model of the available data that can be used in the next stage. Planning, in turn, is the
 utilization of that model with the purpose of outputting useful information to the operator.
 
 \subsection{Analysis}
@@ -160,16 +177,44 @@ this would yield an accuracy of 99\%. Even though this is indeed an impressive n
 about the instances that actually would yield clicks. This is refered to as the problem of imbalanced data sets as described by
 \citet{Chawla2004}.
 
-One way to deal with this problem is to increase the number of instances that we are interested in (positive instances) or 
+One way to deal with this problem is to increase the number of instances that we are interested in (positive instances) or
 decreasing the number of negative instances in so that the total distribution is even. This is called over-sampling and under-
-sampling respectively, and will remove the possibility for a classifier to simply disregard the positive instances in the 
+sampling respectively, and will remove the possibility for a classifier to simply disregard the positive instances in the
 classification \citep{Chawla2004, Japkowicz2002}.
 
-A second alternative is to use the concept of cost modification, i.e. tell the algorithm that it is more costly to misclassify
-positive instances as negative instances than vice versa \citep{Chawla2004, Japkowicz2002}.
+A second alternative is to use the concept of cost modification, i.e. instruct the algorithm that it is more costly to misclassify
+positive instances as negative instances than vice versa, which has been shown to be as effective as over-sampling but with
+increased effieciency \citep{Chawla2004, Japkowicz2002} due to the fact that it does not increase the number of instances in the
+data set.
 
 A third option is to not consider the class to be click/no click, but rather set a threshold rate for the CTR and let the top 50\%
-be classified as high-performing ads and vice versa.
+be classified as high-performing ads and vice versa, but the second alternative was chosen due to its effectiveness in regard to
+both performance and quality of the results and as it does not require a modification of the problem definition.
+
+\subsubsection{Click probability}
+Once the appropriate cost matrix has been applied, the PART algorithm \citep{Frank1998} is used to mine the data for rules.
+For each rule in the result, the number of instances in the data set that are covered by the rule (\(I\)) as well as how many of
+those instances that are misclassified (\(M\)) is calculated. The weight added to the positive instances is refered to as \(W\).
+Using these known values, an expected probability of the rule producing a click, \(\rho\), can be calculated.
+
+\[
+	\rho = \frac{(I-M)\frac{1}{W}}{(I-M)\frac{1}{W}+M} = \frac{I-M}{I-M+MW} = \frac{I-M}{I+M(W-1)}
+\]
+
+This value is simply the number of correctly classified instances (i.e. actual clicks for impressions that match the rule) divided
+by the total number of matching instances (i.e. total number of impressions). \(W\) is used to convert the numbers back to their
+original ratio, since it is the factor used to increase the number of clicks as far as the algorithm is concerned.
+
+\subsection{Planning}
+The goal of the planning step is to identify relevant rules for new campaigns. The definition of relevant is created by the
+operator, who specifies rules for the target group and inputs them to the system. Based on these conditions of relevancy together
+with the model created in the analysis step, relevant rules can be presented to the user.
+
+\subsection{Estimating non-existing rules}
+Depending on the available training data, there might be targets that are not covered by the generated rule sets. By using rules
+that are similar to the desired rule, an estimate can be created. By creating instances that exactly match the available rules as
+well as for the input, a distance function can be used to find the instances, and by extension the rules, that most closely 
+resemble the input. Based on these, an estimate can be calculated.
 
 \section{Project plan}
 The proposed workflow of this thesis is inspired by the agile practices that perhaps most notably have become common in the
@@ -184,12 +229,12 @@ feedback incorporated.
 The initial iterations will most likely require a heavy focus on research and studies of the related fields. The following
 iterations will include more work on the practical side of the projects. Once the research has progressed to an extent that the
 problem space as well as the approach of the solution are well defined, more effort can be put into the development of the final
-application that is to be used by Duego. A preliminary list of milestones are listed below.
+application that is to be used by Duego. A preliminary list of milestones is listed below.
 
 \begin{enumerate}
 	\item Finish extended proposal (June 19)
-	\item Research problem is to be well-defined and theoretical solution described (July 17)
-	\item Demo a prototype of the final system (August 14)
+	\item Demo a basic prototype of the system (July 9)
+	\item Full description and processing of input data (August 14)
 	\item Research should be finalized and draft of final paper submitted to supervisors (September 11)
 	\item Submit final paper to examinator and working system to Duego (October 9)
 \end{enumerate}
@@ -200,13 +245,18 @@ The suggested advertisement and target groups from the system will be added to t
 us to analyze the effectiveness of the software. This can be done continuously over the course of the development in addition to
 more traditional software unit and system testing.
 
+The comparison metric to be used is the estimated click rate calculated for each rule set. This number can be compared with the
+actual click rate that the campaign which is created based on the rules receives. If the difference of the values is not
+statistically significant, the suggestion is considered successful. If the difference is more notable, it might imply that the
+estimation function requires tuning.
+
 \section{Thesis outline}
 \begin{itemize}
 	\item Abstract (0.5 pages)
 	\item Introduction (0.5 pages)
 	\item Problem description (1-2 pages)
 	\item Related works (1 page)
-	\item Solution (3-4 pages)
+	\item Solution (5-7 pages)
 	\begin{itemize}
 		\item Analysis step
 		\item Planning step
