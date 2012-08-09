@@ -1,4 +1,4 @@
-\documentclass[a4paper]{article}
+\documentclass[10pt,twocolumn]{article}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -15,41 +15,43 @@
 \maketitle
 
 \section{Introduction}
-Duego was founded in 2010 with the idea of creating a social networking site targeting those who wish to meet new people. This stands in contrast to the majority of the existing networks that either manage already existing connections (e.g. Facebook, LinkedIn), or where the goal is the help the user to find a romantic partner (i.e. dating sites). Online advertisement is leveraged as a way to promote the site to new users. This is done both using targeted ads that are adapted based on the target demographics on social networks, as well as more conventional ads on websites. Today, managing these campaigns is a manual process that is outsourced to another company.
+As more and more people are using the Internet on a daily basis, the area of online marketing is expanding as a way for organizations to reach large audiences for a relatively small amount of money. A site that displays advertisement, the publisher, is often paid by the advertiser based on the number of times visitors see or click on the ads, but it may also be coupled with other requirements, such as that the visitor goes on to buy a product from the advertiser in a given time span. Because advertisers want to pay as little as possible while still getting good results and distributors often prefering to only show relevant information to their visitors to keep them coming back, the advertisement is typically tailored to the expected interests of the visiting user.
 
-The goal of Duego is to automate the process of adapting ads based on target requirements using software. Such a system would be required to analyze existing campaigns with regard to ads and target groups along with campaign metrics, for example how many people clicked on an ad and how many times an ad has been shown. This data should then be used as a basis for suggesting new ads. The data set that will be used in production consists of hundreds of different campaigns, each with a large number of ads. Along with the attributes of both campaigns and ads, this means that the complete advertisement data set consists of hundreds of thousands of possible attribute combinations that need to be analyzed.
+The material is created by the advertiser, its impact analyzed and based on these results, material can be created, adapted or removed from circulation to better suit a new or existing target audience. This circular process requires a lot of manual labor since the analysis results must be understood and applied to the context of the material as well as the target group. There is a lot of data that needs to be correlated, a task that is well suited for computers.
 
-\section{Problem description}
-The problem in the introduction can be generalized as a problem in the sphere of software engineering, namely knowledge discovery in databases (KDD) and more specifically data mining. Data mining is the process of delegating and automating the task of identifying useful knowledge in a large set of data to a computer, either fully or  partially.
+On Duego, a social networking company founded in 2010, online advertisement is leveraged as a way to promote the site to new users. The process of managing the online marketing data follows the manual process described above. The goal of Duego and this thesis is to automate parts of this process using a software solution.
+
+The system would be required to analyze existing campaigns with regard to ads and target groups along with campaign metrics, for example the number of times an ad is shown. This data should then be used as a basis for suggesting new ads. The data set that will be used in production consists of hundreds of different campaigns, each with a large number of ads. Along with the attributes of both campaigns and ads, this means that the complete advertisement data set consists of hundreds of thousands of possible attribute combinations that need to be analyzed.
+
+The described can be generalized as a problem in the sphere of software engineering, namely knowledge discovery in databases (KDD) and more specifically data mining. Data mining is the process of delegating and automating the task of identifying knowledge that by some definition is useful in a large set of data to a computer, either fully or partially. The following subsections will describe terminology from the fields of automation and marketing respectively. This is followed by a description of the problem this thesis addresses and finally a limitation of the scope of this paper.
 
 \subsection{Automation}
-\begin{figure}[htb] \centering \includegraphics[width=0.7\textwidth]{mape.eps}
+\begin{figure}[htb] \centering \includegraphics[width=0.5\textwidth]{mape.eps}
 	\caption{General MAPE control loop}
 	\label{fig:MAPE}
 \end{figure}
 
-Useful terminology is defined by \citet{IBM2006} in the field of autonomic computing. Figure \ref{fig:MAPE} shows an autonomic manager, which is a component that collects data from a system and, based on this data, performs actions with the purpose of improving the system. This control loop is divided into four subtasks called monitor (collect system information), analyze (correlate and model data), plan (design behaviour required to reach goal) and execute (run the planned actions), sometimes refered to as MAPE. Each subtask can optionally interact with a knowledge base for storing and retrieving data.
+Useful terminology is defined by \citet{IBM2006} in the field of autonomic computing. Figure \ref{fig:MAPE} shows an autonomic manager, which is a component that collects data from a system and, based on this data, performs actions with the purpose of improving the system. This control loop is divided into four subtasks called monitor (collect system information), analyze (correlate and model data), plan (design behaviour required to reach goal) and execute (run the planned actions), sometimes refered to as MAPE. Each subtask can optionally interact with a knowledge base for storing and retrieving data. This will then be applied to online marketing, which is an area that might require some additional background.
 
 \subsection{Marketing}
-A number of marketing terms will be used throughout this paper. A \emph{marketing campaign}, or simply a \emph{campaign}, is comprised of one or more advertising messages, \emph{ads}, that are directed to one defined audience, the \emph{target} or  \emph{target group}. Any ad, and by extension campaign, have numeric measures of success called \emph{metrics}. The most commonly used are \emph{impressions}, which is the number of times an ad has been shown, and \emph{clicks}. Ads are limited to include a  title, a body text and/or an image, as well as the mandatory URL that a user who clicks the ad will be redirected to. A target is defined by demographic data such as age, gender, location or, in the case of for example search engine advertisement, search terms.
+While automation is a commonly researched area in software engineering, marketing is less so. A number of marketing terms will be used throughout this paper. A \emph{marketing campaign}, or simply a \emph{campaign}, is comprised of one or more advertising messages, \emph{ads}, that are directed to one defined audience, the \emph{target} or \emph{target group}. Any ad, and by extension campaign, have numeric measures of success called \emph{metrics}. The most commonly used are \emph{impressions}, which is the number of times an ad has been shown, and clicks. In this paper however, the word \emph{action} will be used when refering to an user interaction, since one might be interested in other values than simple clicks, such as for example the number of users who go on to register at the site after clicking. Ads are limited to include a title, a body text and/or an image, as well as the mandatory URL that a user who clicks the ad will be redirected to. A target is defined based on the options available of the advertisement type used.
 
-\begin{figure}[htb] \centering \includegraphics[width=0.7\textwidth]{campaign-terminology.eps}
-	\caption{Marketing terminology}
+Four such classes can be identified based on the way the ads are adapted based on the user. \emph{Search} advertising uses the user's search terms, \emph{social} advertising uses demographic and personal data, \emph{contextual} advertising finds keywords on the page on which the ads are displayed or uses manual categorization and finally \emph{non-contextual} advertising, which does no relevancy matching. The separation between these classes is not necessarily distinct and a single publisher can use targeting criteria from different classes.
+
+\begin{figure*}[htb] \centering \includegraphics[width=0.9\textwidth]{marketing-uml.eps}
+	\caption{UML description of marketing terminology.}
 	\label{fig:MarketingTerminology}
-\end{figure}
+\end{figure*}
 
 As the word \emph{user} is typically used to refer to a person interacting with either the web site that is being marketed or the web site on which the advertisement is shown, we will use the word \emph{operator} when discussing a person interacting with the system that is described in this paper to avoid confusion.
 
-To formalize the marketing terminology described previously, a target group is an m-tuple \(T = (t_1, t_2, ..., t_m)\) and an ad is an n-tuple \(A = (a_1, a_2, ..., a_n)\). A campaign can thus be described as the pair \(C = (T, A)\) or, by flattening, \(C' = (t_1, t_2, ..., t_m, a_1, a_2, ..., a_n)\). \(C'\) will typically be the format that the system expects input.
-
-
 \subsection{Automated marketing}
-\begin{figure}[htb] \centering \includegraphics[width=0.7\textwidth]{mape-marketing.eps}
+\begin{figure}[htb] \centering \includegraphics[width=0.5\textwidth]{mape-marketing.eps}
 	\caption{Online marketing automation system in control loop}
 	\label{fig:MAPEMarketing}
 \end{figure}
 
-In online marketing, monitoring is the collection of metrics for online advertisement. To optimize these metrics, the gathered information is analyzed and this analysis forms the basis for the planning of future campaigns. Once the plans are completed, the new campaign can be launched, with new metrics being gathered and so on.
+By merging the fields of automation and online marketing we can put the automation terminology in context. Monitoring is the collection of metrics for online advertisement. To optimize these metrics, the gathered information is analyzed and this analysis forms the basis for the planning of future campaigns. Once the plans are completed, the new campaign can be launched, with new metrics being gathered and so on.
 
 Today only the monitoring is automated, where as the other parts of the process are performed manually. It is infeasible to fully automate the whole process, due to for example the creative side of advertisement and the complex factors that decide which groups an upcoming campaign should target. There are however certain areas that can be automated and this paper will focus on automated analysis and planning of online marketing campaigns, shown in Figure \ref{fig:MAPEMarketing}.
 
@@ -60,43 +62,41 @@ Using the MAPE framework in Figure \ref{fig:MAPE}, only the analysis and plannin
 
 Furthermore, the data set will likely include attributes whose values are free text and images. Text mining and image recognition are beyond the scope of this project. Instead these attributes will be manually categorized, so that the value space is discrete and finite.
 
-The concepts of knowledge and useful knowledge are somewhat abstract and would require a philosophical discussion, which will not be covered in this paper.
-
 \section{Related works}
-\citet{Richardson2007} describe a model for predicting the click-through rates of ads given a set of properties in the context of search engine advertisement. Though it is a relevant subject, the major difference between such advertisement and that which occurs on social networking sites is targeting. Search engines uses keyword matching to select possible ads, i.e. what the user is interested in at this moment, where as social networks can uitilize knowledge about who the user is.
+\citet{Richardson2007} describe a model for predicting the click-through rates of ads given a set of properties in the context of search engine advertisement. Though it is a relevant subject, the paper is limited to the specific class of search advertising, and is therefore not directly applicable to this paper.
 
-A number of high-level descriptions of frameworks for knowledge discovery in databases exist \citep{Fayyad1996, Frawley1992} and they exhibit a number of commonalities. These include the importance of having a knowledgeble human operator guiding the process in terms of supplying domain knowledge to the system formulating the goal of the knowledge discovery; feeding discovered knowledge back into the system; and the identification and application of a discovery method, or more specifically the data mining algorithm(s). These descriptions are relevant to the analysis of marketing data, though on a more abstract level.
+In online advertisement there have been problems of so called click-spam or click-fraud, meaning that the number of clicks on ads is increased in a fraudulent manner, for example using bots. \citet{Dave2012} provides a methodology to measure click-spam in their networks as well as a study of the severity of the problem on different classes of networks. Their results show that established search advertising on for example Google and Bing is fairly accurate in their filtering of click-spam, where as the problem is  greater for contextual and social advertisement, and severe for mobile advertisement. A related paper by \citet{Zhang2011} describes a methodology for advertisers to evaluate the quality of click traffic and use this to assess the difference in quality between bulk traffic vendors and established pay-per-click networks.
 
 \section{Solution}
-The solution has been divided into one section each for the two subtasks identified in the problem description. Analysis covers the problem of creating an appropriate model of the available data that can be used in the next stage. Planning, in turn, is the utilization of that model with the purpose of outputting useful information to the operator. Finally, the process of verifying the utility of the system is described.
+The solution has been divided into one section each for the two subtasks identified in the problem description. Analysis covers the problem of creating an appropriate model of the available data that can be used in the next stage. Planning, in turn, is the utilization of that model with the purpose of outputting useful information to the operator. Finally, this is followed by the steps taken to evaluate the results.
 
 \subsection{Analysis}
-The natural distribution of the input data is very uneven because the number of impressions required to receive a click is high. Consider the scenario of a click-through rate (CTR) of 1\%, which means that for every 100 impressions there would on average be one click. The simplest possible classification rule would be a rule that for every instance gives the classification of no click, and this would yield an accuracy of 99\%. Even though this is indeed an impressive number, it is of no use to us since it says nothing about the instances that actually would yield clicks. This is refered to as the problem of imbalanced data sets as described by \citet{Chawla2004}.
+The first step in the process is analysis, and the first substep is how to deal with the input data. The natural distribution of this data is very uneven because the number of impressions required to receive a click is high. Consider the scenario of a click-through rate (CTR) of 1\%, which means that for every 100 impressions there would on average be one click. The simplest possible classification rule would be a rule that for every instance gives the classification of no click, and this would yield an accuracy of 99\%. Even though this is indeed an impressive number, it is of no use to us since it says nothing about the instances that actually would yield clicks. This is refered to as the problem of imbalanced data sets as described by \citet{Chawla2004}.
 
 One way to deal with this problem is to increase the number of instances that we are interested in (positive instances) or decreasing the number of negative instances in so that the total distribution is even. This is called over-sampling and under- sampling respectively, and will remove the possibility for a classifier to simply disregard the positive instances in the classification \citep{Chawla2004, Japkowicz2002}.
 
 A better alternative is to use the concept of cost modification, i.e. instruct the algorithm that it is more costly to misclassify positive instances as negative instances than vice versa, which has been shown to be as effective as over-sampling but with increased efficiency \citep{Chawla2004, Japkowicz2002} due to the fact that it does not increase the number of instances in the data set.
 
-Once the monitored data has been passed to the system it will be added to the knowledge base. The data will also be used to  generate a new analysis model of the full data set which also will be stored in the knowledge base, making it available for the planning subsystem.
-
-As part of the generation of an analysis model, stored estimations may be compared to the monitored data and based on their differences the system can update a number of paramaters for the generation algorithm so that future estimates are improved.
+Once the monitored data has been passed to the system it will be added to the knowledge base. The knowledge base will store all data relating to the marketing campaigns to increase the amount of available data for model generation, described in the next section.
 
 \subsubsection{Model generation}
-The model can be built by any data mining classifier algorithm that adheres to the basic requirements of handling both numerical  and categorical values as well as generating either a decision tree or a set of decision rules, for example the PART algorithm  \citep{Frank1998}.
+The model can be built by any data mining classifier algorithm that adheres to the basic requirementss of handling both numerical and categorical values, as well as generating either a decision tree or a set of decision rules, for example the PART algorithm \citep{Frank1998}. The reason for the latter is that the planning step described in the next section requires trees or rules to successfully calculate suggestions.
 
-To increase accuracy, a stratified tenfold cross-validation approach is recommended, which can optionally be repeated ten times to further improve the result with an additional cost in computing time. The validation step should calculate the success rate of the classification for each rule or leaf on each pass and average the values on completion. Confidence intervals can be calculated using tables for the Bernoulli distribution \citep[chap. 5]{Witten2011} based on the observed success rate \(S\) and the  number of instances that matched the rule \(N\). The probability of success is \(\rho \pm z\) with confidence \(c\).
+To increase accuracy, a stratified tenfold cross-validation approach is recommended, which can optionally be repeated ten times to further improve the result with an additional cost in computing time. The validation step should calculate the success rate of the classification for each rule or leaf on each pass and average the values on completion. Confidence intervals can be calculated using tables for the Bernoulli distribution \citep[chap. 5]{Witten2011} based on the observed success rate \(S\) and the number of instances that matched the rule \(N\). The probability of success is \(\rho \pm z\) with confidence \(c\).
+
+As part of the generation of an analysis model, stored estimations may be compared to the monitored data and based on their differences the system can update a number of paramaters for the generation algorithm so that future estimates are improved.
 
 \subsection{Planning}
 The goal of the planning step is to identify relevant rules for new campaigns. The definition of relevant is created by the operator, who specifies rules for the target group and inputs them to the system. Based on these conditions of relevancy together with the model created in the analysis step, relevant rules can be presented to the user.
 
-Depending on the available training data, there might be targets that are not covered by the generated rule sets. By using rules that are similar to the desired rule, an estimate can be created. By creating instances that exactly match the available rules as well as for the input, a distance function can be used to find the instances, and by extension the rules, that most closely  resemble the input. Based on these, an estimate can be calculated. The estimates may then be stored in the knowledge base to be compared with the observed metrics once the campaign has been run.
+Depending on the available training data, there might be targets that are not covered by the generated rule sets. By using rules that are similar to the desired rule, an estimate can be created. By creating instances that exactly match the available rules as well as for the input, a distance function can be used to find the instances, and by extension the rules, that most closely resemble the input. Based on these, an estimate can be calculated. The estimates may then be stored in the knowledge base to be compared with the observed metrics once the campaign has been run.
 
 Since each rule has a confidence interval of succesful classification, multiple rules that are to be merged can be weighted based on their accuracy. For a single rule, the probability of success (i.e. user action on impression), disregarding the confidence interval, is calculated by taking the number of correctly classified instances, \(\rho*N\), divided by the total number of matching instances \(N\).
 
-\subsection{System verification}
+\subsection{Evaluation}
 The result of the thesis work would be verified by applying the results to the problem suggested by Duego in a real-world setting. The suggested advertisement and target groups from the system will be added to their online marketing portfolio which will allow us to analyze the effectiveness of the software. This can be done continuously over the course of the development in addition to more traditional software unit and system testing.
 
-The comparison metric to be used is the estimated click rate calculated for each rule set. This number can be compared with the actual click rate that the campaign which is created based on the rules receives. Formally, let \(S_1 = (C, \hat{M})\) be the  campaign C and its estimated metric \(\hat{M}\), and \(S_2 = (C, M)\) the actual outcome of the campaign. If the difference  of the values is not statistically significant, i.e. \(|\hat{M} - M| < \epsilon\), the suggestion is considered successful. If the difference is more notable, it might imply that the estimation function requires tuning.
+The comparison metric to be used is the estimated click rate calculated for each rule set. This number can be compared with the actual click rate that the campaign which is created based on the rules receives. Formally, let C be a campaign, \(hat{M}\) an estimation of its associated metrics, and M the actual metrics of the campaign. If the difference of the values is not statistically significant, i.e. \(|\hat{M} - M| < \epsilon\), the suggestion is considered successful. If the difference is more notable, it might imply that the estimation function requires tuning. The value of \(\epsilon\) must be suitably chosen based on the expected size of the numbers, which may differ between publishers.
 
 \section{Discussion}
 Empty.
@@ -105,13 +105,15 @@ Empty.
 \section{Proposal}
 
 \subsection{Foundations}
+A number of high-level descriptions of frameworks for knowledge discovery in databases exist \citep{Fayyad1996, Frawley1992} and they exhibit a number of commonalities. These include the importance of having a knowledgeble human operator guiding the process in terms of supplying domain knowledge to the system formulating the goal of the knowledge discovery; feeding discovered knowledge back into the system; and the identification and application of a discovery method, or more specifically the data mining algorithm(s). These descriptions are relevant to the analysis of marketing data, though on a more abstract level.
+
 In data mining, the input to a system can be described using the terms \emph{concepts}, \emph{instances} and \emph{attributes}, where concept is the actual result of the mining, i.e. what we want to be learned; an instance is one single example of data to be mined and can be compared to a row in a database; and attribute is a property of an instance, which in the database analogy would be a column \citep{Witten2011}.
 
 The Weka Project has defined an input format to be used for their open source data mining software called ARFF (Attribute-Relation File Format) \citep{Garner1995, Witten2011}. This format is used by the Weka software package, but is well-defined and can be used as the input format for custom systems as well. \citet{Witten2011} also describe how to use implementations of Weka in custom software projects as well as how to extend the system with new functionality.
 
 In a highly influential paper, \citet{Quinlan1986} decribe how decision trees can be created from a training set and how well it handles the problem of unknown attributes values and noisy data. A related paper, \citet{Quinlan1987}, deal with how generated decision trees can be simplified in order to more easily be applied. Four different methods are evaluated, one of which is the reformulation of the tree as a set of production rules. This specific topic is further analyzed in \citet{Quinlan1987b} where such production rules are shown to be more compact and also in many cases improve the classification of unseen data. An added positive effect is that production rules from separate classifications can be merged more efficiently than their original decision trees.
 
-Standard decision trees give a best-effort boolean classification of the input data, however sometimes it might be more appropriate to give the probability that the input belongs to each of the available classes. This can be described using probability estimation trees (PETs). \citet{Provost2003} discuss the problems of estimating these probabilities from ordinary decision trees and goes on to show how to increase the accuracy of the estimates by performing tree pruning more conservately and by applying the Laplace correction.  They also show that probability-bagging, meaning the combination of results from multiple classifiers instead of just the one, greatly improves the estimates. The suggested algorithm, called C4.4, is part of a comparative study of PETs by \citet{Chu2011} and is shown to have an impressive accuracy, though other algorithms may still be more appropriate. A likely candidate algorithm for this thesis is the Naive Bayes tree, which is a standard decision tree with the difference that the leaves are Naive Bayes classifiers, providing probabilities that an instance belong to each of the available classes.
+Standard decision trees give a best-effort boolean classification of the input data, however sometimes it might be more appropriate to give the probability that the input belongs to each of the available classes. This can be described using probability estimation trees (PETs). \citet{Provost2003} discuss the problems of estimating these probabilities from ordinary decision trees and goes on to show how to increase the accuracy of the estimates by performing tree pruning more conservately and by applying the Laplace correction. They also show that probability-bagging, meaning the combination of results from multiple classifiers instead of just the one, greatly improves the estimates. The suggested algorithm, called C4.4, is part of a comparative study of PETs by \citet{Chu2011} and is shown to have an impressive accuracy, though other algorithms may still be more appropriate. A likely candidate algorithm for this thesis is the Naive Bayes tree, which is a standard decision tree with the difference that the leaves are Naive Bayes classifiers, providing probabilities that an instance belong to each of the available classes.
 
 A thorough literature study on domain-specific languages is covered by \citet{Deursen2000} and covers high-level topics, such as potential benefits and risks of using DSLs and exemplifying with a number of languages from different areas. The article also mentions the phases of development in the creation of a new DSL, a topic which is described in more detail by \citet{Mernik2005}. The latter article also provides insight into the relevant choices that need be made in the creation process, and both articles help define a useful terminology for discussing the topic of domain-specific languages.
 
@@ -143,8 +145,7 @@ The initial iterations will most likely require a heavy focus on research and st
 \subsection{Thesis outline}
 \begin{itemize}
 	\item Abstract (0.5 pages)
- 	\item Introduction (0.5 pages)
- 	\item Problem description (1-2 pages)
+ 	\item Introduction (2-3 pages)
  	\item Related works (1 page)
  	\item Solution (5-7 pages)
  	\begin{itemize}
@@ -157,5 +158,5 @@ The initial iterations will most likely require a heavy focus on research and st
 \end{itemize}
 
 \bibliographystyle{plainnat}
-\bibliography{references} % references.bib \end{document}
+\bibliography{references} % references.bib
 \end{document}
