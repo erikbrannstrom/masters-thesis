@@ -3,6 +3,8 @@ import weka.core.Instance;
 import weka.core.*;
 import weka.core.Capabilities.*;
 import weka.filters.*;
+import weka.filters.unsupervised.attribute.RemoveUseless;
+import weka.filters.unsupervised.attribute.Remove;
 import weka.classifiers.meta.CostSensitiveClassifier;
 import weka.classifiers.CostMatrix;
 import weka.classifiers.rules.PART;
@@ -24,18 +26,29 @@ public class ADTMain
 		DataSource source = new DataSource(input);
 		Instances data = source.getDataSet();
 
-		// Create filter
-		Instance rule = new DenseInstance(4);
+		// Remove useless attributes
+		int numAttributesOriginal = data.numAttributes();
+		RemoveUseless filterUseless = new RemoveUseless();
+		filterUseless.setInputFormat(data);
+		data = Filter.useFilter(data, filterUseless);
+		System.out.println("Removed " + (numAttributesOriginal-data.numAttributes()) + " useless attributes.");
+
+		// Create filter rule
+		Instance rule = new DenseInstance(data.numAttributes());
 		rule.setDataset(data);
-		rule.setValue(0, "M");
-		rule.setValue(1, 1);
-		rule.setMissing(2);
-		rule.setMissing(3);
-		SimpleStreamFilter filter = new InstanceMatchFilter(rule);
+		rule.setValue(0, "Men");
+		//rule.setValue(1, "19-21");
 
 		// Filter input data
+		SimpleStreamFilter filter = new InstanceMatchFilter(rule, false);
 		filter.setInputFormat(data);
 		data = Filter.useFilter(data, filter);
+		// Remove target attributes
+		Remove remove = new Remove();
+		remove.setAttributeIndices("1,2");
+		remove.setInvertSelection(false);
+		remove.setInputFormat(data);
+		data = Filter.useFilter(data, remove);
 
 		// Set class attribute if not already set, assumed to be the last
 		if (data.classIndex() == -1) {
@@ -61,22 +74,34 @@ public class ADTMain
 			}
 		}
 		double weight = Math.round(data.sumOfWeights()/count)*1.0;
+		System.out.println("Weight of positive class will be increased by " + weight + " times.");
 
 		// Create classifier
 		CostSensitiveClassifier csc = new CostSensitiveClassifier();
 		CostMatrix costMatrix = new CostMatrix(2);
-		costMatrix.setElement(0, 1, 1.0);
-		costMatrix.setElement(1, 0, weight);
+		if (yesValue == 0.0) {
+			costMatrix.setElement(0, 1, weight);
+			costMatrix.setElement(1, 0, 1.0);
+		} else {
+			costMatrix.setElement(0, 1, 1.0);
+			costMatrix.setElement(1, 0, weight);
+		}
+
 		csc.setCostMatrix(costMatrix);
 		J48 j48 = new J48();
+		j48.setBinarySplits(true);
+		j48.setUnpruned(true);
+		j48.setUseLaplace(true);
 		csc.setClassifier(j48);
 		Instances partial = getRandomPartial(data, 0.7, false, 198732467539812L);
 		Instances testData = getRandomPartial(data, 0.3, true, 198732467539812L);
 		csc.buildClassifier(partial);
 
-		System.out.println(j48);
-		int corrects = ClassifierEvaluator.evaluate(j48, testData);
-		corrects = ClassifierEvaluator.evaluate(j48, partial);
+		System.out.println(csc);
+
+		Evaluation eval = new Evaluation(partial);
+		eval.evaluateModel(csc, testData);
+		System.out.println(eval.toSummaryString("\nResults\n======\n", false));
 
 		// Create distinct set of instances
 		InstanceComparator comp = new InstanceComparator(false);
@@ -101,8 +126,8 @@ public class ADTMain
 
 	public static Instances getRandomPartial(Instances data, double ratio, boolean invert, long seed)
 	{
+		System.out.println("Generating random partial data set..");
 		int partialSize = (int)(data.sumOfWeights()*ratio);
-		System.out.println(partialSize);
 		Instances copy = new Instances(data, 0, data.numInstances());
 		Instances partial = new Instances(data, 0, data.numInstances());
 		for (int i = 0; i < partial.numInstances(); i++) {

@@ -8,7 +8,7 @@ import java.util.LinkedList;
 
 import java.io.File;
 
-public class CSV2Arff {
+public class CSV2ArffNumeric {
   /**
    * takes 2 arguments:
    * - CSV input file
@@ -17,7 +17,7 @@ public class CSV2Arff {
   public static void main(String[] args) throws Exception
   {
     if (args.length != 2) {
-      System.out.println("\nUsage: CSV2Arff <input.csv> <output.arff>\n");
+      System.out.println("\nUsage: CSV2ArffNumeric <input.csv> <output.arff>\n");
       System.exit(1);
     }
 
@@ -34,22 +34,14 @@ public class CSV2Arff {
         System.exit(1);
     }
 
-    // Add clicked attribute
-    List<String> yesNo = new LinkedList<String>();
-    yesNo.add("yes");
-    yesNo.add("no");
-    Attribute click = new Attribute("Click", yesNo);
-    data.insertAttributeAt(click, data.numAttributes());
+    // Add CTR%
+    Attribute ctr = new Attribute("CTR");
+    data.insertAttributeAt(ctr, data.numAttributes());
 
-    int length = data.numInstances();
-    for (int i = 0; i < length; i++) {
-        Instance yes = data.instance(i);
-        Instance no = (Instance)yes.copy();
-        yes.setValue(attributeIndex(click, data), "yes");
-        no.setValue(attributeIndex(click, data), "no");
-        yes.setWeight(1.0*yes.value(clicks));
-        no.setWeight(1.0*yes.value(impressions)-yes.value(clicks));
-        data.add(no);
+    for (int i = 0; i < data.numInstances(); i++) {
+        Instance inst = data.instance(i);
+        double val = inst.value(clicks)/inst.value(impressions);
+        inst.setValue(attributeIndex(ctr, data), 10000.0*val);
     }
 
     data.deleteAttributeAt(attributeIndex(clicks, data));

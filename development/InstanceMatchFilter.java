@@ -7,6 +7,7 @@ import weka.filters.*;
 public class InstanceMatchFilter extends SimpleStreamFilter
 {
 	private Instance rule;
+	private boolean removeAttributes;
 	private List<Integer> removedAttributes;
 
 	/**
@@ -14,9 +15,10 @@ public class InstanceMatchFilter extends SimpleStreamFilter
 	 * to the rule instance used for initialization, and only those whose values
 	 * match exactly for non-missing values are kept.
 	 */
-	public InstanceMatchFilter(Instance rule)
+	public InstanceMatchFilter(Instance rule, boolean removeAttributes)
 	{
 		this.rule = rule;
+		this.removeAttributes = removeAttributes;
 		this.removedAttributes = new LinkedList<Integer>();
 	}
 
@@ -36,6 +38,10 @@ public class InstanceMatchFilter extends SimpleStreamFilter
 	protected Instances determineOutputFormat(Instances inputFormat)
 	{
 		Instances result = new Instances(inputFormat, 0);
+		if (!this.removeAttributes) {
+			return result;
+		}
+
 		for (int i = this.rule.numAttributes()-1; i >= 0; i--) {
 			if (!this.rule.isMissing(i)) {
 				this.removedAttributes.add(i);
@@ -58,8 +64,9 @@ public class InstanceMatchFilter extends SimpleStreamFilter
 			} else if (this.rule.value(n) != inst.value(n)) {
 				// If values do not match, we don't keep the instance
 				return null;
-			} else if (this.rule.value(n) == inst.value(n)) {
-				matchingAttributes++;
+			} else if (!this.removeAttributes) {
+				values[ref] = inst.value(n);
+				ref++;
 			}
 		}
 		Instance result = new DenseInstance(inst.weight(), values);

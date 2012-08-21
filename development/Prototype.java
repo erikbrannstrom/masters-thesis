@@ -2,6 +2,8 @@ import java.util.*;
 import weka.classifiers.meta.CostSensitiveClassifier;
 import weka.classifiers.CostMatrix;
 import weka.classifiers.rules.PART;
+import weka.classifiers.trees.J48;
+import weka.classifiers.Evaluation;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 
@@ -9,7 +11,7 @@ public class Prototype
 {
 	private static double YES_WEIGHT = 2500.0;
 
-	public static void main(String[] args)
+	public static void main(String[] args) throws Exception
 	{
 		if (args.length == 0) {
 			System.out.println("Argument for input file missing.");
@@ -40,7 +42,7 @@ public class Prototype
 				break;
 			}
 		}
-		
+
 		// Calculate the weight of class=yes instances
 		double count = 0.0;
 		for (int i = 0; i < data.numInstances(); i++) {
@@ -75,8 +77,18 @@ public class Prototype
 		costMatrix.setElement(0, 1, 1.0);
 		costMatrix.setElement(1, 0, YES_WEIGHT);
 		csc.setCostMatrix(costMatrix);
+		//J48 j48 = new J48();
+		//csc.setClassifier(j48);
 		PART part = new PART();
 		csc.setClassifier(part);
+
+		Evaluation eval = new Evaluation(data);
+		Random rand = new Random(1);
+		int folds = 10;
+		eval.crossValidateModel(csc, data, folds, rand);
+		//System.out.println(eval.toClassDetailsString());
+		System.out.println(csc.toString());
+		System.exit(0);
 
 		// Build classifier using imported instances
 		try {
@@ -85,6 +97,10 @@ public class Prototype
 			System.out.println("Could not create classifier from instances.");
 			System.exit(-1);
 		}
+
+		//System.out.println(csc.graph());
+		System.out.println(csc.toString().replaceAll("\n", " "));
+		System.exit(0);
 
 		// Parse string of classification rules
 		String[] rules = csc.toString().split("\n\n");
