@@ -1,201 +1,1 @@
-duego: duego
-y: y
-a: a
-de: de
-Únete: Únete
-conoce: conoce
-entra: entra
-en: en
-amigos: amigos
-chavos: chavos
-chavas: chavas
-gente: gente
-ahora: ahora
-haz: haz
-es: es
-amigas: amigas
-por: por
-para: para
-vota: vota
-quieres: quieres
-conocer: conocer
-diviértete: diviértete
-pásala: pásala
-juega: juega
-súper: súper
-hacer: hacer
-onda: onda
-el: el
-buena: buena
-mejor: mejor
-te: te
-más: más
-miles: miles
-guapas: guapas
-nuevos: nuevos
-lo: lo
-guapos: guapos
-sitio: sitio
-gratis: gratis
-checa: checa
-las: las
-muy: muy
-se: se
-mismo: mismo
-toluca: toluca
-gusto: gusto
-fotos: fotos
-ya: ya
-e: e
-votaste: votaste
-interesantes: interesantes
-querétaro: querétaro
-parecen: parecen
-monterrey: monterrey
-pasarla: pasarla
-nuevas: nuevas
-guadalajara: guadalajara
-qué: qué
-tus: tus
-los: los
-bien: bien
-nueva: nueva
-conversa: conversa
-salir: salir
-está: está
-divertirás: divertirás
-parece: parece
-puebla: puebla
-buscas: buscas
-conversar: conversar
-platica: platica
-df: df
-celeb: celeb
-hora: hora
-aburrido: aburrido
-aburrida: aburrida
-chida: chida
-ella: ella
-él: él
-conociendo: conociendo
-mejores: mejores
-hazte: hazte
-ciudad: ciudad
-eres: eres
-chido: chido
-del: del
-juego: juego
-famosos: famosos
-federal: federal
-distrito: distrito
-celebridades: celebridades
-fácil: fácil
-todo: todo
-gdl: gdl
-lindas: lindas
-lindos: lindos
-mty: mty
-prueba: prueba
-padre: padre
-muchos: muchos
-valentín: valentín
-san: san
-elige: elige
-pásatela: pásatela
-tu: tu
-un: un
-gusta: gusta
-méxico: méxico
-dar: dar
-guapo: guapo
-descubre: descubre
-guapa: guapa
-amigo: amigo
-qro: qro
-encuentra: encuentra
-amiga: amiga
-una: una
-este: este
-la: la
-cita: cita
-tí: tí
-divertido: divertido
-divertirte: divertirte
-padrísimo: padrísimo
-madre: madre
-famosas: famosas
-toda: toda
-tener: tener
-planes: planes
-podrás: podrás
-descubrir: descubrir
-que: que
-no: no
-chécalo: chécalo
-pasar: pasar
-inolvidable: inolvidable
-nuevo: nuevo
-totalmente: totalmente
-su: su
-aburre: aburre
-cansaste: cansaste
-guapísimos: guapísimos
-buenísima: buenísima
-guapísimas: guapísimas
-conócelas: conócelas
-esperan: esperan
-son: son
-esperes: esperes
-jugando: jugando
-famosa: famosa
-alivianada: alivianada
-tienes: tienes
-conocerás: conocerás
-mediáticos: mediáticos
-como: como
-ven: ven
-famoso: famoso
-quienes: quienes
-trae: trae
-con: con
-tiene: tiene
-cd: cd
-perfecta: perfecta
-acerca: acerca
-anti: anti
-quien: quien
-también: también
-soltero: soltero
-sin: sin
-tuyo: tuyo
-odias: odias
-prefieres: prefieres
-pasarlo: pasarlo
-piensa: piensa
-mío: mío
-donde: donde
-completamente: completamente
-irías: irías
-bárbara: bárbara
-al: al
-chavo: chavo
-perfecto: perfecto
-daniela: daniela
-chava: chava
-maite: maite
-sola: sola
-solo: solo
-chicos: chicos
-soltería: soltería
-chicas: chicas
-mariana: mariana
-estar: estar
-rodrigo: rodrigo
-eduardo: eduardo
-mane: mane
-soltera: soltera
-conócelo: conócelo
-pasarás: pasarás
-mauricio: mauricio
-c: c
-conócela: conócela
+aburrir: aburrida, aburrido, aburre, aburridas, aburridos, aburriracerca: acerca, sobreahora: ahora, yadivertido: alivianada, alivianado, alivianadas, alivianados, cool, buena onda, buenísima onda, divertido, divertida, divertidos, divertidasamigo: amigo, amigos, amiga, amigasbien: bien, muy bien, a todo dar, súperbuscar: buscar, buscas, buscarás, buscastecansar: cansar, cansaste, cansado, cansadagente: gente, chava, chavo, chavas, chavos, chica, chico, chicas, chicoschecar: checar, checa, chécalo, chécalachido: chido, chida, chidos, chidas, a toda madre, padre, padrísimocita: cita, citasciudad: ciudad, ciudad de méxico, méxico d.f., méxico df, d.f., cd de méxico, cd. de méxico, distrito federal, df, monterrey, mty, guadalajara, gdl, querétaro, qro, toluca, pueblacompletamente: completamente, totalmenteconocer: conocer, conoce, conócela, conócelo, conócelas, conócelos, conocerás, conociendoplaticar: conversar, conversa, platicar, platicadescubrir: descubrir, descubre, descubrirásdivertir: divertir, divertirás, divertirte, diviértetedonde: donde, dónde, lugar, sitioduego: duegoelegir: elegir, elige, elegirás, elegisteencontrar: encontrar, encuentra, encontrarásentrar: entrar, entraesperar: esperar, esperan, esperesfácil: fácil, sencillofamoso: famoso, famosa, famosos, famosas, celebridades, mediáticos, mediáticas, celeb, daniela, bárbara, maite, mariana, mane, mauricio, eduardo, rodrigofoto: foto, fotosgratis: gratis, sin costoguapo: guapo, guapa, guapos, guapas, guapísimos, guapísimas, lindo, lindos, linda, lindasgustar: gustar, gusta, gusto, gustaráhacer: hacer, haz, hazteinolvidable: inolvidableinteresante: interesante, interesantesir: ir, irías, irásjugar: jugar, juega, jugandojuego: juego, juegosmejor: mejor, mejoresmuchos: muchos, muchas, milespropiedad: mío, míos, mía, mías, tuyo, tuyos, tuya, tuyas, tus, tumismo: mismo, mismanuevo: nuevo, nueva, nuevos, nuevasodiar: odiar, odiasparece: parece, parecen, ve como, ven comopasar: pasar, pasa, pásala, pasarás, pasarla, pasarlo, pásatelaperfecto: perfecto, perfecta, perfectos, perfectaspensar: pensar, piensaplan: plan, planespodrás: podrásprefieres: prefieresprobar: probar, pruebaquien: quien, quienesquerer: querer, quieres, quierensalir: salirsolo: solo, solamentesoltero: soltero, soltera, solteros, solteras, soltería, solatener: tener, tiene, tienestodo: todo, todatraer: traer, traeunir: unir, únetesan valentín: san valentínvotar: votar, vata, votaste
