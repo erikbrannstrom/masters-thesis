@@ -87,7 +87,7 @@ public class CBRPrepare
 		    double mean = numClicks/numImpressions;
 		    double s2 = ( numClicks*Math.pow(1.0-mean, 2) + (numImpressions-numClicks)*Math.pow(0.0-mean, 2) ) / (numImpressions-1);
 		    double delta = 1.96*Math.sqrt(s2/numImpressions);
-		    inst.setValue(ctrL, mean-delta);
+		    inst.setValue(ctrL, Math.max(0.0, mean-delta));
 		    inst.setValue(ctrH, mean+delta);
 		}
 		System.out.println(data);

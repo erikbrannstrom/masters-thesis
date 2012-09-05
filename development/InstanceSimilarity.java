@@ -1,4 +1,6 @@
 import java.util.*;
+import java.math.BigDecimal;
+import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Capabilities.*;
@@ -13,7 +15,7 @@ public class InstanceSimilarity
 	private Instances data;
 
 	public static void main(String[] args) throws Exception {
-		if (args.length == 0) {
+		if (args.length < 2) {
 			System.out.println("Missing command line arguments.");
 			System.exit(1);
 		}
@@ -34,34 +36,36 @@ public class InstanceSimilarity
 
 		// Test similarity of instances
 		InstanceSimilarity sim = new InstanceSimilarity(data);
-		Instance testInstance = new DenseInstance(data.firstInstance());
-		testInstance.setDataset(data);
 
-		// Test first instance, should return exact match
-		System.out.println("Find closest match to the following instance:");
-		System.out.println(testInstance);
-		sim.getMostSimilar(testInstance);
+		Instance targetInstance = new DenseInstance(data.numAttributes());
+		targetInstance.setDataset(data);
+		String[] targets = args[1].split(",");
+		for (String target : targets) {
+			String[] attrValue = target.split("=");
+			Attribute attr = data.attribute(attrValue[0]);
+			if (attr.isNominal()) {
+				targetInstance.setValue(attr, attrValue[1]);
+			} else {
+				targetInstance.setValue(attr, Double.parseDouble(attrValue[1]));
+			}
+		}
 
-		// Change gender to male, age = 0 (19-21), etc
-		testInstance.setValue(0, 1);
-		testInstance.setValue(1, 0);
-		testInstance.setValue(2, 0);
-		testInstance.setValue(3, 0);
-		testInstance.setValue(4, 0);
-		testInstance.setValue(5, 1);
-		testInstance.setValue(7, 1);
-		testInstance.setValue(8, 1);
-		testInstance.setValue(10, 1);
-		testInstance.setValue(11, 1);
-		testInstance.setValue(12, 1);
-		testInstance.setValue(13, 0);
-		testInstance.setValue(15, 1);
-		testInstance.setValue(16, 1);
-		testInstance.setValue(17, 0);
-		testInstance.setValue(18, 1);
 		System.out.println("Find closest match to the following instance:");
-		System.out.println(testInstance);
-		sim.getMostSimilar(testInstance);
+		System.out.println(targetInstance);
+		System.out.println();
+		sim.sortByEstimate(targetInstance);
+
+		Attribute ctrLow = data.attribute("CTR-Low");
+
+		for (Instance match : data) {
+			double ctrMin = sim.similarity(targetInstance, match) * match.value(ctrLow);
+			if (ctrMin < 0.0) {
+				ctrMin = 0.0;
+			} else {
+				ctrMin *= 100.0;
+			}
+			System.out.printf("%-120s CTR%% >= %.5f%%\n", match, BigDecimal.valueOf(ctrMin));
+		}
 	}
 
 	public InstanceSimilarity(Instances data)
@@ -69,19 +73,39 @@ public class InstanceSimilarity
 		this.data = data;
 	}
 
-	public Instance getMostSimilar(Instance inst)
+	public void sortBySimilarity(final Instance inst)
 	{
-		double maxScore = 0;
-		Instance bestMatch = null;
-		for (int i = 0; i < this.data.numInstances(); i++) {
-			double score = this.similarity(inst, this.data.get(i));
-			if (score > maxScore) {
-				bestMatch = this.data.get(i);
-				maxScore = score;
+		Collections.sort(this.data, new Comparator<Instance>() {
+			public int compare(Instance i1, Instance i2) {
+				double simScore1 = InstanceSimilarity.this.similarity(inst, i1);
+				double simScore2 = InstanceSimilarity.this.similarity(inst, i2);
+				if (Math.abs(simScore1-simScore2) < 0.00001) {
+					return 0;
+				} else if (simScore1 < simScore2) {
+					return -1;
+				} else {
+					return 1;
+				}
 			}
-		}
-		System.out.println(bestMatch.toString() + "\t\t" + maxScore);
-		return bestMatch;
+		});
+	}
+
+	public void sortByEstimate(final Instance inst)
+	{
+		final Attribute ctrLow = this.data.attribute("CTR-Low");
+		Collections.sort(this.data, new Comparator<Instance>() {
+			public int compare(Instance i1, Instance i2) {
+				double simScore1 = InstanceSimilarity.this.similarity(inst, i1) * i1.value(ctrLow);
+				double simScore2 = InstanceSimilarity.this.similarity(inst, i2) * i2.value(ctrLow);
+				if (Math.abs(simScore1-simScore2) < 0.0000001) {
+					return 0;
+				} else if (simScore1 < simScore2) {
+					return -1;
+				} else {
+					return 1;
+				}
+			}
+		});
 	}
 
 	protected double similarity(Instance a, Instance b)
@@ -90,21 +114,17 @@ public class InstanceSimilarity
 			throw new RuntimeException("Instances do not have the same headers.");
 		}
 		double score = 0;
+		int numCountedAttributes = 0;
 		for (int i = 0; i < a.numAttributes(); i++) {
-			if (a.classIndex() == i) {
+			if (a.classIndex() == i || a.isMissing(i) || b.isMissing(i)) {
 				continue;
 			} else if (Math.abs(a.value(i)-b.value(i)) < 0.001) {
 				score += 1.0;
 			}
+			numCountedAttributes++;
 		}
 
-		if (a.dataset().classIndex() < 0) {
-			score = score / a.numAttributes();
-		} else {
-			score = score / (a.numAttributes()-1);
-		}
-
-		return score;
+		return score / numCountedAttributes;
 	}
 
 }

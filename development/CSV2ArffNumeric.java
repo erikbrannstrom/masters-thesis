@@ -41,7 +41,7 @@ public class CSV2ArffNumeric {
     for (int i = 0; i < data.numInstances(); i++) {
         Instance inst = data.instance(i);
         double val = inst.value(clicks)/inst.value(impressions);
-        inst.setValue(attributeIndex(ctr, data), 10000.0*val);
+        inst.setValue(attributeIndex(ctr, data), val);
     }
 
     data.deleteAttributeAt(attributeIndex(clicks, data));
