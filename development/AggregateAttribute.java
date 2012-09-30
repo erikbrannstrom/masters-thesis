@@ -4,17 +4,12 @@ import weka.core.Attribute;
 import weka.core.*;
 import weka.core.Capabilities.*;
 import weka.filters.*;
-import weka.filters.unsupervised.attribute.RemoveUseless;
 import weka.filters.unsupervised.attribute.Remove;
 import weka.classifiers.meta.CostSensitiveClassifier;
-import weka.classifiers.CostMatrix;
-import weka.classifiers.rules.PART;
-import weka.classifiers.trees.J48;
-import weka.classifiers.Evaluation;
 import weka.core.converters.ConverterUtils.DataSource;
 import java.util.regex.*;
 
-public class CBRPrepare
+public class AggregateAttribute
 {
 	public static void main(String[] args) throws Exception {
 		if (args.length == 0) {
@@ -22,15 +17,10 @@ public class CBRPrepare
 			System.exit(1);
 		}
 		String input = args[0];
+		final String aggAttribute = args[1];
 
 		DataSource source = new DataSource(input);
 		Instances data = source.getDataSet();
-
-		// Remove useless attributes
-		int numAttributesOriginal = data.numAttributes();
-		RemoveUseless filterUseless = new RemoveUseless();
-		filterUseless.setInputFormat(data);
-		data = Filter.useFilter(data, filterUseless);
 
 		Attribute clicks = data.attribute("Clicks");
 		Attribute impressions = data.attribute("Impressions");
@@ -46,7 +36,10 @@ public class CBRPrepare
 				double[] bValues = b.toDoubleArray();
 				for (int i = 0; i < aValues.length; i++) {
 					Attribute attr = a.dataset().attribute(i);
-					if (attr.name().equals("Clicks") || attr.name().equals("Impressions")) {
+					if (attr.name().equals("Clicks")
+						|| attr.name().equals("Impressions")
+						|| attr.name().equals(aggAttribute)
+					) {
 						continue;
 					} else if (aValues[i] < bValues[i]) {
 						return -1;
@@ -74,25 +67,7 @@ public class CBRPrepare
 			}
 		}
 
-		// Add CTR% with 95% confidence interval, assuming a normal distribution
-		Attribute ctrMean = new Attribute("CTR-Mean", data.numAttributes());
-		data.insertAttributeAt(ctrMean, data.numAttributes());
-		Attribute ctrDelta = new Attribute("CTR-Delta", data.numAttributes());
-		data.insertAttributeAt(ctrDelta, data.numAttributes());
-
-		for (int i = 0; i < data.numInstances(); i++) {
-		    Instance inst = data.instance(i);
-		    double numClicks = inst.value(clicks);
-		    double numImpressions = inst.value(impressions);
-		    double mean = numClicks/numImpressions;
-		    double s2 = ( numClicks*Math.pow(1.0-mean, 2) + (numImpressions-numClicks)*Math.pow(0.0-mean, 2) ) / (numImpressions-1);
-		    double delta = 1.96*Math.sqrt(s2/numImpressions);
-		    inst.setValue(ctrMean, mean);
-		    inst.setValue(ctrDelta, delta);
-		}
-
-		data.deleteAttributeAt(impressions.index());
-		data.deleteAttributeAt(clicks.index());
+		data.deleteAttributeAt(data.attribute(aggAttribute).index());
 		System.out.println(data);
 	}
 

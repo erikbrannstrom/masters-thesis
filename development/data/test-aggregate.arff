@@ -1,0 +1,17 @@
+@relation test-aggregate
+
+@attribute Gender {Women,Men}
+@attribute Age {18,22}
+@attribute Text {Text1, Text2}
+@attribute Image {Image1, Image2}
+@attribute Clicks numeric
+@attribute Impressions numeric
+
+@data
+Women,18,Text1,Image1,20,1000
+Women,22,Text1,Image1,30,2000
+Women,22,Text1,Image2,40,3000
+Women,18,Text2,Image2,50,4000
+Men,18,Text1,Image1,10,3000
+Men,22,Text1,Image1,35,4000
+Men,22,Text2,Image1,5,750

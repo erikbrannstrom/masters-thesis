@@ -1,0 +1,14 @@
+@relation pl-women-image1-weka.filters.unsupervised.attribute.NominalToBinary-Rfirst-last
+
+@attribute Image numeric
+@attribute Text=Text1 numeric
+@attribute Text=Text2 numeric
+@attribute Text=Text3 numeric
+@attribute Text=Text4 numeric
+@attribute CTR numeric
+
+@data
+0,1,0,0,0,0.000116
+0,0,1,0,0,0.000263
+0,0,0,1,0,0.000277
+0,0,0,0,1,0.0002

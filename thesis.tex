@@ -113,84 +113,103 @@ The solution has been divided into one section each for the two subtasks identif
 \section{Analysis}
 The first step in the process is analysis, and the first substep is how to deal with the input data. The data contains a set of metrics which are not best used in their raw form. The analysis step therefore calculates a confidence interval on the mean of the action rate, since it is more helpful in later processing steps than the more commonly used average action rate which do not take the size of the sample space into account.
 
+The reason for specifying a confidence interval is to account for the inherit variance of values such as the action rate. Even though a campaign has been shown millions of times, there is still some degree of uncertainty to what the action rate would be if it was shown another million times. A \(100(1-\alpha)\%\) confidence interval is defined as the interval of values that a random variable \(X\) will take with a probability of \(1-\alpha\), or formally
+
+\begin{equation}
+	P[L_1 \leq X \leq L_2] = 1 - \alpha
+\end{equation}
+
+The standard function for calculating the values of the interval limits \(L_1\) and \(L_2\) is shown in equation \ref{eq:IntervalLimitsKnownVariance}.
+
+\begin{equation}
+	L = \bar{X} \pm z_{\alpha/2} \sigma/\sqrt{n}
+	\label{eq:IntervalLimitsKnownVariance}
+\end{equation}
+
 The confidence interval is calculated based on the assumption of a normal distribution of the action rate. While the underlying distribution of each ad impression might not be normal, the Central Limit Theorem resolves that problem. The theorem defines that for a sample \(X_1, X_2, ..., X_n\) where \(n\) is large (empirically shown to work for \(n\) as low as 25), \(\bar{X}\) is approximately normal with mean \(\mu\) and variance \(\sigma^2/n\) \citep{Milton2002}.
 
-On first look there is a problem with the use of a normal distribution. Because the variance is unknown and therefore needs to be estimated, this means that Student's t-distribution is more appropriate. However, because of the fact that \(t_\alpha/2 \to z_\alpha/2\) as the degrees of freedom approaches infinity (already at 2000 degrees of freedom the value for \(t_\alpha/2)\) is 1.96 when rounded two two decimals, the same as the Z score).
+At first look there is a problem with the use of a normal distribution. Because the variance is unknown and therefore needs to be estimated, this means that Student's t-distribution is more appropriate and that equation \ref{eq:IntervalLimitsUnknownVariance} should be used. However, because of the fact that \(t_{\alpha/2} \to z_{\alpha/2}\) as the degrees of freedom approaches infinity (at 2000 degrees of freedom, \(t_{0.025} \sim z_{0.025} \sim 1.96\) when rounded to two decimals), they are for all intents and purposes equal since we are typically working with impressions that quickly generate high degrees of freedom.
 
-The distribution was also empirically tested using plotting to see that it follows the well-known bell curve of normal distributions as well as using the empirical rule, which states that for a normal distribution 68/95/99.7 percent of the values are respectively within 1/2/3 standard deviations of the mean.
+\begin{equation}
+	L = \bar{X} \pm t_{\alpha/2} S/\sqrt{n}
+	\label{eq:IntervalLimitsUnknownVariance}
+\end{equation}
 
-Once the monitored data has been passed to the system it will be added to the knowledge base. The knowledge base will store all data relating to the marketing campaigns to increase the amount of available data for model generation, described in the next section.
+The distribution was also empirically tested using plotting to see that it follows the well-known bell curve of normal distributions as well as using the empirical rule, which states that for a normal distribution, about 68/95/99.7 percent of the values are respectively within 1/2/3 standard deviations of the mean.
 
-\subsection{Model generation}
-% TODO: Argue more for the requirements below
-The model is built by any data mining classifier algorithm that adheres to the basic requirements of handling both numerical and categorical values, as well as generating either a decision tree or a set of decision rules, for example the PART algorithm \citep{Frank1998}. The reason for the latter is that the planning step described in the next section requires trees or rules to successfully calculate suggestions.
+After this processing, the data is added to the knowledge base for future use. The knowledge base will store all data relating to the marketing campaigns to increase the amount of available data to base decisions on.
 
-To increase accuracy, a stratified tenfold cross-validation approach is recommended, which can optionally be repeated ten times to further improve the result with an additional cost in computing time. The validation step calculates the success rate of the classification for each rule or leaf on each pass and average the values on completion.
+Following this, additional data sets are created to support the planning phase. The idea is that ad properties are dealt with not only in combination but also as stand-alone entities to gain further insight into what makes ad work. Each ad property in every campaign instance from the data set is stored separately along with the campaign's metrics (i.e. impressions and actions). If an identical ad property value already exists, the metrics are aggregated so they reflect all occurrences of that property value.
 
-The monitored data consist of a series of trials, where each trial is either a success or a failure. Each trial is also independent from any other trial. These properties are two of the three geometric properties, and adherence to these mean the data follows a Bernoulli distribution \citep{Milton2002}. Confidence intervals are therefore be calculated using tables for this distribution \citep[chap. 5]{Witten2011} based on the observed success rate \(S\) and the number of instances that matched the rule \(N\). The probability of success (i.e. user action) is \(\rho \pm z\) with confidence \(c\).
+\begin{figure}[htb] \centering \includegraphics[width=0.8\textwidth]{data-set-example.eps}
+	\caption{Data set example}
+	\label{fig:DataSetExample}
+\end{figure}
 
-As part of the generation of an analysis model, stored estimations may be compared to the monitored data and based on their differences the system updates a number of parameters for the generation algorithm so that future estimates are improved.
+Figure \ref{fig:DataSetExample} shows an example of how the original data set could look like. The campaigns do not include any form of targeting and thus only consist of the ad properties image and text, as well as the metrics gathered, in this case impressions and clicks.
+
+The second step of aggregating metrics for individual properties requires both impressions and clicks to be summed for each value of every ad property. For example, the data set for images would have one instance for Image A which has 1700 impressions and 9 clicks. The end result is shown in figure \ref{fig:DataSetPropertiesExample}.
+
+\begin{figure}[htb] \centering \includegraphics[width=0.6\textwidth]{data-set-properties-example.eps}
+	\caption{Aggregating metrics in data set for each property value}
+	\label{fig:DataSetPropertiesExample}
+\end{figure}
+
+For advertisers who also use targeting which is likely to impact the choice of ad properties, these additional data sets must be related to their respective targets and the aggregation of metrics should take this into account. For example, if the advertiser runs campaigns with images that target male and female users separetly, there will be one data set for images used on males and one data set for images used on females. An image used to target both sexes will thus appear in both of these data sets, but the metrics may be different.
 
 \section{Planning}
-The goal of the planning step is to identify relevant rules for new campaigns. The definition of relevant is created by the operator, who specifies rules for the target group and inputs them to the system. Based on these conditions of relevancy together with the model created in the analysis step, relevant rules are presented to the user.
+The goal of the planning step is to formulate suggestions for upcoming campaigns. This is done by selecting values for each ad property that has an average action rate that lies above the mean of the property. Using the example in figure \ref{fig:DataSetPropertiesExample}, the mean is \((9+19)/(1700+1200) \approx .0097\) for images and \((24+4)/(2200+700) \approx .0097\) for texts, so Image B and Text C are selected for combination.
 
-Depending on the available training data, there might be targets that are not covered by the generated rule sets. By using rules that are similar to the desired rule, an estimate is created. By creating instances that exactly match the available rules as well as for the input, a distance function is then used to find the instances, and by extension the rules, that most closely resemble the input. Based on these, an estimate is calculated. The estimates may then be stored in the knowledge base to be compared with the observed metrics once the campaign has been run.
+If the advertiser is running campaigns with different target groups, the basis for the planning must only be properties that are used with the specific target groups decided upon by the operator.
 
-Since each rule has a confidence interval of successful classification, multiple rules that are to be merged are weighted based on their accuracy so that rules with high probability of success and a tight confidence interval are preferred. For a single rule, the probability of success, disregarding the confidence interval, is calculated by taking the number of correctly classified instances, \(\rho*N\), divided by the total number of matching instances \(N\).
+For every combination, an estimate of the real action rate is created. In the case of the above example, there is already an existing campaign in the knowledge base that is identical, so the actual action rate of that ad (or the average of all identical campaigns, if there are more than one) is used as an estimate.
+
+An interesting and likely problem arises when the combination has never been used before. Once again using the example data set, the combination Image B and Text D does not exist previously so a method for estimating the action rate for such campaigns must be defined.
+
+Existing variables to base the estimate on are the metrics for each property, but they are not enough by themselves since one property may carry a stronger influence on the actual result than another. The Pearson coefficient of correlation is such a measure and it is defined as
+
+\begin{equation}
+	\rho = \frac{Cov(X, Y)}{\sqrt{(Var X)(Var Y)}}
+\end{equation}
+
+Because the covariance and variance are unknown they have to be estimated based on the sample.
+
+\begin{equation}
+	\hat{\rho} = \frac{\widehat{Cov(X, Y)}}{\sqrt{(\widehat{Var X})(\widehat{Var Y})}} = \frac{ \sum_{i=1}^{n} (X_i - \bar{X})(Y_i - \bar{Y}) }{ \sqrt{ (\sum_{i=1}^{n} (X_i - \bar{X})^2) (\sum_{i=1}^{n} (Y_i - \bar{Y})^2) } }
+\end{equation}
+
+Because \(-1 \leq \hat{\rho} \leq 1 \), where a value of 1 or -1 means there is an exact linear correlation between the two random variables and 0 means there is no linear correlation at all, values for the correlation of \(X_1\) and \(X_2\)in relation \(Y_0\) are comparable. This is useful to get an understanding of which variable most strongly influences the value of the dependent variable and also whether that influence is positive or negative.
+
+Another possible solution to identifying the correlation is to use multiple linear regression. The general linear model is defined as
+
+\begin{equation}
+	\mu_{Y|x_1,x_2,\dotsc,x_k} = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \dotsc + \beta_k x_k
+\end{equation}
+
+where \(\mu\) is the mean of \(Y\) given values for its dependent variables \citep{Milton2002}. The \(\beta\)-values define the change in \(\mu\) for each unit of change in the related \(x\), and could as such be used as some form of correlation measure. This approach would be useful if the linear regression model could provide good estimates for the dependent variable's value, but empirical analysis on this project showed a much too great variance for the model to be useful for this purpose. As such, using linear regression cannot provide any additional value than the simpler Pearson coeffiecient.
+
+The variables available for basing the estimation for the combination of two different properties X and Y are thus the low and high values of the action rate confidence interval, refered to as \(x_{low}\), \(x_{high}\), \(y_{low}\) and \(y_{high}\) respectively, as well as the correlation coefficient for each attribute, \(\rho_x\) and \(\rho_y\). The idea behind the estimation function is to sum the average action rate of each property, which is weighted depending on how much the property tends to influence the result, and normalize that sum. Using the previously mentioned variables, the estimation function is described as the following inequality.
+
+\begin{equation}
+	\frac{\rho_x x_{low} + \rho_y y_{low}}{\rho_x + \rho_y} \leq z \leq \frac{\rho_x x_{high} + \rho_y y_{high}}{\rho_x + \rho_y}
+\end{equation}
+
+Finally, the estimates are used to rank suggested campaigns based on the likelihood of resulting in high action rates. This is to provide decision support for domain experts who handle the final execution of marketing campaigns.
 
 \section{Evaluation}
-The result of the thesis work was verified by applying the results to the problem suggested by Duego in a real-world setting. The suggested advertisement and target groups from the system will be added to their online marketing portfolio which will allow us to analyze the effectiveness of the software. This was done continuously over the course of the development in addition to more traditional software unit and system testing.
+For the system to be useful to the advertiser, the final estimates for suggested campaigns must be accurate enough so they can be trusted by the domain experts making decisions on which campaigns to run. As the combining of possibly unrelated ad properties may give rise to more uncertainty than what existed when those same properties were considered separatly, the estimation function needs to be evaluated.
 
-The comparison metric to be used is the estimated click rate calculated for each rule set. This number is compared to the actual click rate that the campaign which is created based on the rules receives. Formally, let C be a campaign, \(\hat{M}\) an estimation of C.Metrics, and M the actual metrics of the campaign. If the difference between the values is not statistically significant, i.e. \(|\hat{M} - M| < \epsilon\), the suggestion is considered successful. If the difference is more notable, it might imply that the estimation function requires tuning. The value of \(\epsilon\) must be suitably chosen based on the expected size of the numbers, which may differ between publishers.
+The system is tested by using using the available infrastructure for managing marketing campaigns at Duego. The test consists of selecting ten suggested campaigns to run live. After each campaign has gathered at least half a million impressions, the final mean action rate is calculated and compared to the original estimate. If a 90\% confidence interval on the action rates used as the basis for estimation is chosen, and assuming this confidence interval is applicable to the estimates as well, there is a 10\% chance that the mean action rate from the test is not in the interval. The results are considered to be validated if no more than two of the ten campaigns fall outside of the estimated intervals.
 
 \chapter{Discussion}
 \section{Risk factors}
 Because the output of the system is dependent on historical data, an assumption has been made that older data is still representative of the current state of the marketing. This is definitely not true for campaigns that are adapted for Christmas, Valentine's Day or other special occasions. The assumption is that the amount of such time-dependent data is so small that it will not impact the final results. If however there is reason to believe that this set of data would influence the output, the recommended approach is to remove it from the knowledge base.
 
-% TODO: Move to the actual use of Bernoulli distributions, or removed if not relevant
-Another assumption has been that ad impressions are independent of each other. This is in fact a simplification, due to the fact that the same ad may be shown to the same user many times, which might in turn impact how the user looks at the ad because the brand is recognized.
+\section{Future work}
+This paper uses a very simple similarity measure for the targeting because it is not a central part of the thesis. For advertisers with many campaigns with differing targeting it would probably be interesting to develop a more advanced form of measure. Certain attributes may not have a binary relation (related or not related) but rather they may themselves have a similarity score. An example of this could be age, where the similarity score in this paper would be zero for two targets of age 19 and 20 respectively, though in reality it seems likely that these groups would be attracted to the same properties in an ad.
 
 \chapter{Conclusion}
 Empty.
-
-\chapter{Proposal}
-
-\section{Research notes}
-The Weka Project has defined an input format to be used for their open source data mining software called ARFF (Attribute-Relation File Format) \citep{Garner1995, Witten2011}. This format is used by the Weka software package, but is well-defined and can be used as the input format for custom systems as well. \citet{Witten2011} also describe how to use implementations of Weka in custom software projects as well as how to extend the system with new functionality.
-
-Standard decision trees give a best-effort boolean classification of the input data, however sometimes it might be more appropriate to give the probability that the input belongs to each of the available classes. This can be described using probability estimation trees (PETs). \citet{Provost2003} discuss the problems of estimating these probabilities from ordinary decision trees and goes on to show how to increase the accuracy of the estimates by performing tree pruning more conservately and by applying the Laplace correction. They also show that probability-bagging, meaning the combination of results from multiple classifiers instead of just the one, greatly improves the estimates. The suggested algorithm, called C4.4, is part of a comparative study of PETs by \citet{Chu2011} and is shown to have an impressive accuracy, though other algorithms may still be more appropriate.
-
-\citet{Hahsler2007} presents a package for the R software environment used in statistical computing, which implements a base for transaction databases as well as integration with two of the most common mining algorithms, Apriori and Eclat. One of the useful implementation choices is the implementation of the sparse matrix data structure, which greatly reduces memory load.
-
-\section{Project plan}
-The proposed workflow of this thesis is inspired by the agile practices that perhaps most notably have become common in the software development industry. The most important methods that should be applied to this work are iterative project development and frequent ``customer collaboration'', in this case thesis supervisors from both Chalmers University of Technology and Duego Technologies AB.
-
-The project is expected to run for about 20 weeks. By dividing this relatively long period of time into iterations of four weeks, the project will be easier to manage from my point of view as well as provide ample opportunity for the supervisors to have their feedback incorporated.
-
-The initial iterations will most likely require a heavy focus on research and studies of the related fields. The following iterations will include more work on the practical side of the projects. Once the research has progressed to an extent that the problem space as well as the approach of the solution are well defined, more effort can be put into the development of the final application that is to be used by Duego. A preliminary list of milestones is listed below.
-
-\begin{enumerate}
-	\item Finish extended proposal (June 19)
-	\item Demo a basic prototype of the system (July 9)
-	\item Full description and processing of input data (August 14)
-	\item Research should be finalized and draft of final paper submitted to supervisors (September 11)
-	\item Submit final paper to examinator and working system to Duego (October 9)
-\end{enumerate}
-
-\section{Thesis outline}
-\begin{itemize}
-	\item Abstract (0.5 pages)
- 	\item Introduction (5 pages)
- 	\item Related works (1 page)
- 	\item Solution (10 pages)
- 	\begin{itemize}
-		\item Analysis step
-		\item Planning step
-		\item Verification
-	\end{itemize}
-	\item Discussion (2 page)
-	\item Conclusion (1 page)
-\end{itemize}
 
 \bibliography{references} % references.bib
 \addcontentsline{toc}{chapter}{\numberline{} Bibliography} % For pdf

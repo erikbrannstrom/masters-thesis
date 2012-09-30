@@ -1,0 +1,17 @@
+@relation BR_live_test-men-only
+
+@attribute Text {Text-Low,Text-High,Text-Avg}
+@attribute Image {Image-High,Image-Avg,Image-Low}
+@attribute CTR-Mean numeric
+@attribute CTR-Delta numeric
+
+@data
+Text-Low,Image-High,0.00063,0.000132
+Text-Low,Image-Avg,0.000426,0.000096
+Text-Low,Image-Low,0.000359,0.000081
+Text-High,Image-High,0.000461,0.000098
+Text-High,Image-Avg,0.000426,0.000098
+Text-High,Image-Low,0.000289,0.000069
+Text-Avg,Image-High,0.000601,0.000126
+Text-Avg,Image-Avg,0.000451,0.000095
+Text-Avg,Image-Low,0.000359,0.000082
