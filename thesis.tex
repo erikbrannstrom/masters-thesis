@@ -196,6 +196,83 @@ The variables available for basing the estimation for the combination of two dif
 
 Finally, the estimates are used to rank suggested campaigns based on the likelihood of resulting in high action rates. This is to provide decision support for domain experts who handle the final execution of marketing campaigns.
 
+\section{Rate estimation}
+To validate the regression model as a sufficient mean of estimation, we used an actual data set from Duego. The data set was randomly split into two separate, non-overlapping sets called training and validation. The training set was then used to create the regression model, after which the action rate of the validation instances was estimated. For each such estimate, an estimate was considered successful if the following inequality held.
+
+\[
+	c_i - \epsilon \leq \hat{c}_i \leq c_i + \epsilon
+\]
+
+\(c_i\) is the actual action rate from the validation set and \(\hat{c}_i\) the estimated value. The tolerance limit is defined as \(\epsilon = k*\bar{c}\), where \(k\) is a constant between 0 and 1. This process was repeated 5000 times and both the total number of estimations as well as the number of successful estimations were counted. From this a success percentage was calculated for different values of \(k\). Table \ref{tbl:EstimationSuccess} and Figure \ref{fig:EstimationSuccess} show the results of this experiment.
+
+\begin{table}[htbp]
+\begin{center}
+	\begin{tabular}{  l | r r r r }
+		\hline
+		\textbf{Method} & \textbf{k=0.01} & \textbf{k=0.05} & \textbf{k=0.10} & \textbf{k=0.20} \\
+		\hline
+		Uniform distribution (range) & 1.51\% & 7.41\% & 14.32\% & 29.74\% \\
+		Normal distribution & 2.55\% & 12.99\% & 25.72\% & 48.50\% \\
+		Regression model & 1.90\% & 14.78\% & 33.40\% & 72.64\% \\
+		\hline
+	\end{tabular}
+	\caption{Estimation success percentage over 5000 rounds}
+	\label{tbl:EstimationSuccess}
+\end{center}
+\end{table}
+
+\begin{figure}[htbp]
+\begin{center}
+	\begin{tikzpicture} \begin{axis}[
+	    ybar,
+	    enlargelimits=0.15,
+	    legend pos=north west,
+	    ylabel={Sucess rate (\%)},
+	    xlabel={k},
+	    symbolic x coords={0.01,0.05,0.10,0.20},
+	    xtick=data,
+	    ]
+	\addplot coordinates {(0.01, 1.505) (0.05, 7.405) (0.10, 14.315) (0.20, 29.74)};
+	\addplot coordinates {(0.01, 2.55) (0.05, 12.99) (0.10, 25.72) (0.20, 48.50)};
+	\addplot coordinates {(0.01, 1.895) (0.05, 14.775) (0.10, 33.395) (0.20, 72.635)};
+	\legend{Uniform,Normal,Regression}
+	\end{axis}
+	\end{tikzpicture}
+	\caption{Bar chart of Table \ref{tbl:EstimationSuccess}}
+	\label{fig:EstimationSuccess}
+\end{center}
+\end{figure}
+
+As \(k\) increases it becomes clear that the regression model is noticibly better than the statistical distributions. Additional experiments revealed that the regression model reached a 50\% success rate at \(k \approx 0.135\).
+
+\section{Selection strategy}
+Once the estimations are made the question becomes how to select which ads to run. Obviously it is reasonable to assume that higher estimates are more likely to perform well, but it is less obvious whether a higher action rate can be expected by selecting multiple ads from the estimates.
+
+Strategy N is defined as the selection strategy where the N highest estimated ads are selected and run. In addition to this, the ads can be run either weighted or unweighted. The latter means that all ads are shown the same amount of times, where as the former approach calculates a weight for each ad based on the normalized value of the estimate. The average real action rate is calculated as shown below. This process was then repeated 5000 times and the values averaged to identify the optimal selection strategy. The results are available in Table \ref{tbl:SelectionStrategy}.
+
+\[
+	c_{unweighted} = \sum_{i=1}^{N} \frac{ c_i }{ N }
+\]
+\[
+	c_{weighted} = \frac{ \sum_{i=1}^{N} \hat{c}_i \cdot c_i }{ \sum_{i=1}^{N} \hat{c}_i }
+\]
+
+\begin{table}
+\begin{center}
+	\begin{tabular}{  l | r  r  }
+		\hline
+		\textbf{No. of ads} & \textbf{Unweighted} & \textbf{Weighted} \\
+		\hline
+		1 & 0.0214\% & 0.0214\% \\
+		2 & 0.0209\% & 0.0209\% \\
+		3 & 0.0206\% & 0.0206\% \\
+		\hline
+	\end{tabular}
+	\caption{Averaged real action rate for selection strategies}
+	\label{tbl:SelectionStrategy}
+\end{center}
+\end{table}
+
 \section{Evaluation}
 For the system to be useful to the advertiser, the final estimates for suggested campaigns must be accurate enough so they can be trusted by the domain experts making decisions on which campaigns to run. As the combining of possibly unrelated ad properties may give rise to more uncertainty than what existed when those same properties were considered separatly, the estimation function needs to be evaluated.
 
