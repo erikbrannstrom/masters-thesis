@@ -1,8 +1,10 @@
 import weka.core.*;
 import java.util.*;
 import weka.classifiers.Classifier;
+import weka.classifiers.AbstractClassifier;
 import weka.core.converters.ConverterUtils.DataSource;
-import weka.classifiers.functions.SMOreg;
+import weka.classifiers.functions.*;
+import weka.classifiers.trees.M5P;
 
 public class CampaignFactory
 {
@@ -12,6 +14,11 @@ public class CampaignFactory
 	public CampaignFactory(Instances data)
 	{
 		this.data = data;
+	}
+
+	public Instances data()
+	{
+		return this.data;
 	}
 
 	public Instances suggestions()
@@ -25,15 +32,19 @@ public class CampaignFactory
 	public Classifier classifier()
 	{
 		if (this.classifier == null) {
-			this.classifier = new SMOreg();
-			try {
-				this.classifier.buildClassifier(this.data);
-			} catch (Exception e) {
-				System.out.println(e);
-				System.exit(1);
-			}
+			this.setClassifier(new SMOreg());
 		}
 		return this.classifier;
+	}
+
+	public void setClassifier(Classifier classifier)
+	{
+		this.classifier = classifier;
+		try {
+			this.classifier.buildClassifier(this.data);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private void createSuggestions()
@@ -109,30 +120,135 @@ public class CampaignFactory
 		DataSource source = new DataSource(args[0]);
 		Instances data = source.getDataSet();
 
-		DataDistribution dd = new DataDistribution(data);
-		DataGenerator gen = new DataGenerator(dd.mean(), dd.variance(), new Scenario1());
-
 		data.setClassIndex(data.numAttributes()-1);
 
-		double sumErrorRate = 0.0;
-		double sumRandErrorRate = 0.0;
-		int runs = 100;
+		int runs = 1000;
 		if (args.length > 1) {
 			runs = Integer.parseInt(args[1]);
 		}
 
-		for (int i = 0; i < runs; i++) {
-			DataGenerator gen2 = new DataGenerator(data);
+		List<Double> ks = new LinkedList<Double>();
+		ks.add(0.01);
+		ks.add(0.05);
+		ks.add(0.10);
+		ks.add(0.20);
 
-			CampaignFactory cf = new CampaignFactory(gen2.trainingSet());
-
-			SuggestionEvaluator suggestionEval = new SuggestionEvaluator(cf, data);
-			sumErrorRate += suggestionEval.errorRatio();
-			sumRandErrorRate += suggestionEval.randomErrorRatio();
+		for (double k : ks) {
+			System.out.println("k = " + k);
+			String[] opts = { "-R", "1000" };
+			experiment(data, runs, k, 0.10, "weka.classifiers.functions.Logistic", opts);
 		}
 
-		System.out.printf("Average error rate over %d runs: %f\n", runs, sumErrorRate/runs);
-		System.out.printf("Average error rate over %d runs for random values: %f\n", runs, sumRandErrorRate/runs);
+/*
+		for (double k : ks) {
+			for (double ratio = 0.05; ratio < 0.95; ratio += 0.05) {
+				System.out.printf("[Experiment: k=%.2f, ratio=%.2f]\n", k, ratio);
+				experiment(data, runs, k, ratio, "weka.classifiers.functions.SMOreg");
+			}
+		}
+*/
+/*
+		for (double k : ks) {
+			System.out.println("k = " + k);
+			experiment(data, runs, k, 0.10, "weka.classifiers.functions.SMOreg");
+			experiment(data, runs, k, 0.10, "weka.classifiers.functions.LinearRegression");
+			experiment(data, runs, k, 0.10, "weka.classifiers.trees.M5P");
+			experiment(data, runs, k, 0.10, "weka.classifiers.lazy.IBk");
+			experiment(data, runs, k, 0.10, "weka.classifiers.functions.MultilayerPerceptron");
+			experiment(data, runs, k, 0.10, "weka.classifiers.trees.REPTree");
+		}
+*/
+
+	}
+
+	private static void experiment(Instances data, int runs, double k, double validationRatio, String classifierClass)
+	{
+		experiment(data, runs, k, validationRatio, classifierClass, null);
+	}
+
+	private static void experiment(Instances data, int runs, double k, double validationRatio, String classifierClass, String[] opts)
+	{
+/*
+		int strategies = 3;
+		double[] avgRates = new double[strategies];
+		double[] avgRatesWeighted = new double[strategies];
+		double deltaSum = 0.0;
+
+		// Constant!
+		double avgRateWomen = 0.000237927;
+		double avgRateMen = 0.00021608;
+
+		double avgRate = avgRateWomen;
+
+		double sumErrorRate = 0.0;
+		double sumRandErrorRate = 0.0;
+		double sumUniformMinMaxErrorRate = 0.0;
+
+		List<Double> rankRates = new LinkedList<Double>();
+
+		for (int i = 0; i < runs; i++) {
+			if (i % 200 == 0 && i != 0) {
+				double comp = 100*i/runs;
+				//System.out.printf("%.2f%% complete..\n", comp);
+			}
+			DataGenerator gen2 = new DataGenerator(data);
+			gen2.setValidationRatio(validationRatio);
+
+			CampaignFactory cf = new CampaignFactory(gen2.trainingSet());
+			try {
+				cf.setClassifier(AbstractClassifier.forName(classifierClass, opts));
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+
+			SuggestionEvaluator suggestionEval = new SuggestionEvaluator(cf, data);
+			suggestionEval.delta(avgRate*k);
+			sumErrorRate += suggestionEval.errorRatio();
+			//sumRandErrorRate += suggestionEval.randomErrorRatio();
+			//sumUniformMinMaxErrorRate += suggestionEval.uniformMinMaxErrorRatio();
+			deltaSum += suggestionEval.delta();
+
+
+			RankTest rank = new RankTest(cf, data);
+			int[] res = rank.rankMatches();
+			for (int rankIndex = 0; rankIndex < res.length; rankIndex++) {
+				if (rankRates.size() > rankIndex) {
+					rankRates.set(rankIndex, rankRates.get(rankIndex)+res[rankIndex]);
+				} else {
+					rankRates.add(rankIndex, (double)res[rankIndex]);
+				}
+			}
+
+			StrategyTest strat = new StrategyTest(cf, data);
+			double[] res = strat.errorRatio(strategies, false);
+			for (int j = 0; j < strategies; j++) {
+				avgRates[j] += res[j];
+			}
+
+			res = strat.errorRatio(strategies, true);
+			for (int j = 0; j < strategies; j++) {
+				avgRatesWeighted[j] += res[j];
+			}
+
+		}
+
+		for (int j = 0; j < rankRates.size(); j++) {
+			System.out.printf("Average success rate for rank %d: %f\n", (j+1), rankRates.get(j)/runs);
+		}
+
+		for (int j = 0; j < strategies; j++) {
+			System.out.printf("Average action rate for Strategy %d over %d runs: %f\n", (j+1), runs, avgRates[j]/runs);
+		}
+		for (int j = 0; j < strategies; j++) {
+			System.out.printf("Average action rate for weighted Strategy %d over %d runs: %f\n", (j+1), runs, avgRatesWeighted[j]/runs);
+		}
+*/
+		//System.out.printf("%s: %f\n", classifierClass, 1-sumErrorRate/runs);
+		//System.out.printf("Success rate over %d runs for normal random values: %f\n", runs, 1-sumRandErrorRate/runs);
+		//System.out.printf("Success rate over %d runs for uniform random values with min/max: %f\n", runs, 1-sumUniformMinMaxErrorRate/runs);
+
+		//System.out.printf("Average delta: %f\n", deltaSum/runs);
+		//System.out.printf("Average click rate for women in data set: %f\n", avgRateWomen);
 
 		//suggestionEval.printEval();
 	}

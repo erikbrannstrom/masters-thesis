@@ -22,7 +22,7 @@ public class AggregateAttribute
 		DataSource source = new DataSource(input);
 		Instances data = source.getDataSet();
 
-		Attribute clicks = data.attribute("Clicks");
+		Attribute clicks = data.attribute("Clicks Count");
 		Attribute impressions = data.attribute("Impressions");
 
 		if (clicks == null || impressions == null) {
@@ -36,7 +36,7 @@ public class AggregateAttribute
 				double[] bValues = b.toDoubleArray();
 				for (int i = 0; i < aValues.length; i++) {
 					Attribute attr = a.dataset().attribute(i);
-					if (attr.name().equals("Clicks")
+					if (attr.name().equals("Clicks Count")
 						|| attr.name().equals("Impressions")
 						|| attr.name().equals(aggAttribute)
 					) {
@@ -74,7 +74,7 @@ public class AggregateAttribute
 	protected static boolean instancesEqual(Instance a, Instance b)
 	{
 		for (int i = 0; i < a.numAttributes(); i++) {
-			if (a.attribute(i).name().equals("Clicks") || a.attribute(i).name().equals("Impressions")) {
+			if (a.attribute(i).name().equals("Clicks Count") || a.attribute(i).name().equals("Impressions")) {
 				continue;
 			} else if (Math.abs(a.value(i)-b.value(i)) > 0.001) {
 				return false;
