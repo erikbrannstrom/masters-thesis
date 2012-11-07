@@ -15,28 +15,19 @@
 \usepackage{multirow}
 \usepackage{array}
 \usepackage{geometry}
-\usepackage{fancyhdr}
-\usepackage{fncychap}
 \usepackage[hyphens]{url}
 \usepackage[breaklinks,pdfpagelabels=false]{hyperref}
 \usepackage{lettrine}
 \usepackage{eso-pic}
+\usepackage{pgfplots}
 
 \newcommand{\rd}{\ensuremath{\mathrm{d}}}
 \newcommand{\id}{\ensuremath{\,\rd}}
 \newcommand{\degC}{\ensuremath{\,\unit{^\circ C}}}
 
-% Fancyheader shortcuts
-\newcommand{\setdefaulthdr}{%
-\fancyhead[L]{\slshape \rightmark}%
-\fancyhead[R]{\slshape \leftmark}%
-\fancyfoot[C]{\thepage}%
-}
-\newcommand{\setspecialhdr}{%
-\fancyhead[L]{ }%
-\fancyhead[R]{\slshape \leftmark}%
-\fancyfoot[C]{\thepage}%
-}
+% Sub- and superscript
+\newcommand{\superscript}[1]{\ensuremath{^{\textrm{#1}}}}
+\newcommand{\subscript}[1]{\ensuremath{_{\textrm{#1}}}}
 
 \newcommand{\mail}[1]{\href{mailto:#1}{\nolinkurl{#1}}}
 \newcommand{\backgroundpic}[3]{%
