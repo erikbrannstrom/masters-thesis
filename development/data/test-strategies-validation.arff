@@ -1,0 +1,11 @@
+@relation test-strategies-validation
+
+@attribute Text {Text1, Text2}
+@attribute Image {Image1, Image2}
+@attribute CTR numeric
+
+@data
+Text1,Image1,0.6
+Text2,Image1,0.3
+Text1,Image2,0.25
+Text2,Image2,0.1
