@@ -36,12 +36,10 @@ public class CombinationAdFactory implements AdFactory
 			Instance suggestion = it.next();
 			for (Instance orig : this.data) {
 				boolean remove = true;
-				//System.out.println(orig + " vs. " + suggestion);
 				for (int i = 0; i < this.data.numAttributes(); i++) {
 					if ( ! Ads.AD.contains(this.data.attribute(i).name().replaceAll("_", " ")) ) {
 						continue;
 					}
-					//System.out.println(" - " + Math.abs(suggestion.value(i) - orig.value(i)));
 					if (Math.abs(suggestion.value(i) - orig.value(i)) > 0.0001) {
 						remove = false;
 						break;

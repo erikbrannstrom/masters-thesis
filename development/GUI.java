@@ -23,9 +23,8 @@ public class GUI extends JFrame
 		}
 		this.tableModel = new AdsTableModel(null);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		JPanel panel = new JPanel(new MigLayout("fill","[]10[]10[]10[]","[]10[fill]"));
+		JPanel panel = new JPanel(new MigLayout("fill", "", "[]10:10:10[grow]"));
 		panel.setOpaque(true);
-		panel.setBackground(Color.GREEN.darker());
 		this.setContentPane(panel);
 
 		this.dataManager = new DatabaseManager("instances");
@@ -60,13 +59,14 @@ public class GUI extends JFrame
 		this.setJMenuBar(menuBar);
 
 		// Target
-		this.add(new JLabel("Target:"));
+		JPanel pnlTarget = new JPanel(new MigLayout("ins 5"));
+		pnlTarget.add(new JLabel("Target:"));
 		String[] targetsGender = {"Men", "Women"};
 		JComboBox cmbGender = new JComboBox(targetsGender);
-		this.add(cmbGender);
+		pnlTarget.add(cmbGender);
 		String[] targetsAge = {"19-23","24-30","31-35"};
 		JComboBox cmbAge = new JComboBox(targetsAge);
-		this.add(cmbAge);
+		pnlTarget.add(cmbAge);
 		JButton btnSubmit = new JButton("Show suggestions");
 		btnSubmit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -84,21 +84,13 @@ public class GUI extends JFrame
 				}
 			}
 		});
-		this.add(btnSubmit, new CC().wrap());
+		pnlTarget.add(btnSubmit);
+		this.add(pnlTarget, "wrap");
 
 		// Table
 		JTable table = new JTable(this.tableModel);
 		JScrollPane scrollPane = new JScrollPane(table);
-		scrollPane.setBackground(Color.BLUE.darker());
-		this.add(scrollPane, new CC().span().grow());
-
-		this.addComponentListener(new ComponentAdapter() {
-		    @Override
-		    public void componentResized(ComponentEvent e)
-		    {
-		        validate();
-		    }
-		});
+		this.add(scrollPane, "grow 100 100");
 
 		// Show frame
 		this.pack();

@@ -52,7 +52,6 @@ public class NominalEstimator extends Estimator
 		knowledge.deleteAttributeAt(actions.index());
 
 		this.knowledge = knowledge;
-		System.out.println(knowledge);
 	}
 
 	private void classifier(Classifier classifier)
