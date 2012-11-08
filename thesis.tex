@@ -224,7 +224,9 @@ The average number of impressions for the ads in the data set was 143875.17 and 
 
 Due to changes to the marketing strategy of Company A over the course of this project, the data set was adapted to match their new approach. The most noticeable difference was the removal of distinct age groups for targeting, which left gender as the only targeting property. To still be able to use the data set, the metrics of campaigns that only differed in the targeted age group were aggregated. Other changes to the strategy included using the same title on all ads and changing the regions in which marketing took place. This aggregation reduced the number of unique instances to 64.
 
-A visual analysis of a graph of the click rate hinted of a normal distribution. To judge whether this was the case, the Shapiro-Wilk normality test \citep{Shapiro1965} was used. Because the test is limited to a sample size of 50, the data set was divided into two sets according to gender. This approach was already planned however, since the system does not handle targeting. In addition to this split, ads that had not received any clicks were considered to be outliers and removed from the sampling to not skew the results. This turned out to only affect a single ad. The test revealed that both sets were in fact normally distributed.
+A visual analysis of a graph of the click rates hinted of a normal distribution. To judge whether this was the case, the extended Shapiro-Wilks normality test \citep{Royston1982} as implemented in R\footnote{http://www.r-project.org/} was used. Ads that had not received any clicks were considered to be outliers and removed from the sampling to not skew the results. This turned out to only affect a single ad.
+
+A significance level, \(\alpha\), of 0.05 was chosen for the null hypothesis \(H_0\), which would mean the data is normal. The test returned the test statistic \(W = 0.9654\) and a p-value of 0.07339. Since \(0.07339 > \alpha\), we cannot reject \(H_0\) and therefore we assume a normal distribution of the data set.
 
 When no specification is made in regard to which data set was used for a specific experiment, it is implied that the results are based on the part of the aggregated data set which targeted women. Though all experiments have been run on both subsets, we have chosen to only give the results of one set as long as the results do not differ.
 
@@ -271,7 +273,12 @@ The final package is Evaluation, whose only interface is \textit{Evaluator}. The
 
 The \textit{RankEvaluator} in turn does not require an Estimator directly, but rather utilizes the results of the ClassifierEvaluator to establish how well classifiers perform for different selection strategies, as described in RQ 1.3.
 
-This overview of components and classes has explained how the software was designed in order to perform the experiments that are described in the following subsections.
+This overview of components and classes has explained how the software was designed. The following subsections will first suggest how to create the knowledge base required by the system, followed by descriptions of the validation experiments and their results.
+
+\subsection{Knowledge base}
+The data manager was mentioned as the component which interacts with the knowledge base. The knowledge base contains all historical data used by the system and must thus not only be able to provide data, but also be updatable. The actual contents of the knowledge base should be limited to only the data which is used by the other components to conserve space, unless that specification of what is useful and not is likely to change.
+
+An efficient way of storing the structured data that we are dealing with is a database. By storing only the necessary data in a database and updating it whenever new monitored metrics are available, not only is the data manager's task simplified but the data can also be queried from outside the system which avoids lock-in of data, something that could be a problem for some organizations.
 
 \subsection{Impact of properties}
 To show whether different properties carry different weight in regard to how well an ad performs was an important first step in order to get an indication of the potential merits of modeling the data. For example, if an ad consists of an image and a text, are the choices of image and text equally important in the search of a high-performing ad or does one carry a stronger influence on the final result than the other? Or even more importantly, if the properties carry no correlation to the click-rate, that would imply performance has nothing to do with the ad properties defined by the advertiser. To measure this we use the Pearson coefficient of correlation, which is defined as
