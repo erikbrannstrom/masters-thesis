@@ -89,6 +89,7 @@ public class GUI extends JFrame
 
 		// Table
 		JTable table = new JTable(this.tableModel);
+		table.setAutoCreateRowSorter(true);
 		JScrollPane scrollPane = new JScrollPane(table);
 		this.add(scrollPane, "grow 100 100");
 
