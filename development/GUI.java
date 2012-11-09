@@ -8,12 +8,18 @@ import java.awt.Toolkit;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import weka.core.*;
 import java.util.*;
+import weka.core.converters.DatabaseLoader;
 
 public class GUI extends JFrame
 {
 	private AdsTableModel tableModel;
 	private DataManager dataManager;
 	private AdFactory adFactory;
+
+	// GUI components
+	private JTable table;
+	private JComboBox cmbGender;
+	private JComboBox cmbAge;
 
 	public GUI()
 	{
@@ -47,6 +53,53 @@ public class GUI extends JFrame
 			Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		menuFile.add(menuItmReport);
 
+		JMenuItem menuItmExport = new JMenuItem("Export selection");
+		menuItmExport.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Get selected rows
+				int[] selection = table.getSelectedRows();
+				for (int i = 0; i < selection.length; i++) {
+					selection[i] = table.convertRowIndexToModel(selection[i]);
+				}
+				if (selection.length == 0) {
+					JOptionPane.showMessageDialog(GUI.this, "No rows selected.");
+					return;
+				}
+				// Create list with a map for each ad
+				List<Map<String,String>> adList = new LinkedList<Map<String,String>>();
+				for (int row : selection) {
+					Map<String,String> adMap = new HashMap<String,String>();
+					adMap.put("Body", tableModel.getValueAt(row, tableModel.findColumn("Body")).toString());
+					adMap.put("Image Hash", tableModel.getValueAt(row, tableModel.findColumn("Image_Hash")).toString());
+					String val = (String)cmbGender.getSelectedItem();
+					if (val.equalsIgnoreCase("All")) {
+						val = "";
+					}
+					adMap.put("Gender", val);
+					val = (String)cmbAge.getSelectedItem();
+					if (val.equalsIgnoreCase("All")) {
+						adMap.put("Age Min", "");
+						adMap.put("Age Max", "");
+					} else {
+						adMap.put("Age Min", val.substring(0, val.indexOf("-")));
+						adMap.put("Age Max", val.substring(val.indexOf("-")+1));
+					}
+					adList.add(adMap);
+				}
+				Exporter exp = new Exporter("data/export-template.csv");
+				JFileChooser chooser = new JFileChooser();
+				chooser.setFileFilter(new FileNameExtensionFilter("CSV", "csv"));
+				int returnVal = chooser.showSaveDialog(null);
+				if(returnVal == JFileChooser.APPROVE_OPTION) {
+					exp.export(chooser.getSelectedFile(), adList);
+					JOptionPane.showMessageDialog(GUI.this, "All lines were exported successfully.");
+				}
+			}
+		});
+		menuItmExport.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E,
+			Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		menuFile.add(menuItmExport);
+
 		JMenuItem quit = new JMenuItem("Quit");
 		quit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -59,14 +112,37 @@ public class GUI extends JFrame
 		this.setJMenuBar(menuBar);
 
 		// Target
-		//Instances headers = this.dataManager.get();
+		DatabaseLoader loader = null;
+		Instances inst = null;
+		try {
+			loader = new DatabaseLoader();
+			loader.connectToDatabase();
+			loader.setQuery("SELECT Gender, Age_Min, Age_Max FROM instances");
+			inst = loader.getDataSet();
+			loader.reset();
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+
 		JPanel pnlTarget = new JPanel(new MigLayout("ins 5"));
 		pnlTarget.add(new JLabel("Target:"));
-		String[] targetsGender = {"Men", "Women", "All"};
-		final JComboBox cmbGender = new JComboBox(targetsGender);
+		List<String> genders = new LinkedList<String>();
+		for (int i = 0; i < inst.attribute("Gender").numValues(); i++) {
+			genders.add(inst.attribute("Gender").value(i));
+		}
+		genders.add("All");
+		cmbGender = new JComboBox(genders.toArray(new String[0]));
 		pnlTarget.add(cmbGender);
+
 		String[] targetsAge = {"18-23","24-30","31-35", "All"};
-		final JComboBox cmbAge = new JComboBox(targetsAge);
+		Set<String> ages = new TreeSet<String>();
+		Attribute attMinAge = inst.attribute("Age_Min");
+		Attribute attMaxAge = inst.attribute("Age_Max");
+		for (Instance instance : inst) {
+			ages.add(instance.value(attMinAge) + "-" + instance.value(attMaxAge));
+		}
+		ages.add("All");
+		cmbAge = new JComboBox(ages.toArray(new String[0]));
 		pnlTarget.add(cmbAge);
 		JButton btnSubmit = new JButton("Show suggestions");
 		btnSubmit.addActionListener(new ActionListener() {
@@ -100,7 +176,7 @@ public class GUI extends JFrame
 		this.add(pnlTarget, "wrap");
 
 		// Table
-		JTable table = new JTable(this.tableModel);
+		table = new JTable(this.tableModel);
 		table.setAutoCreateRowSorter(true);
 		JScrollPane scrollPane = new JScrollPane(table);
 		this.add(scrollPane, "grow 100 100");

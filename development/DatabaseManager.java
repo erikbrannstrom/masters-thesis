@@ -57,9 +57,12 @@ public class DatabaseManager implements DataManager
 			loader.connectToDatabase();
 			loader.setQuery(String.format("SELECT Body, Image_Hash, Clicks_Count, Impressions FROM %s %s", this.tableName, whereClause));
 			if (loader.getDataSet() == null) {
+				loader.reset();
 				return null;
 			} else {
-				return new Ads(loader.getDataSet());
+				Ads ads = new Ads(loader.getDataSet());
+				loader.reset();
+				return ads;
 			}
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
