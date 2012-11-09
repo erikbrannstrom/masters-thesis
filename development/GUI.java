@@ -59,18 +59,30 @@ public class GUI extends JFrame
 		this.setJMenuBar(menuBar);
 
 		// Target
+		//Instances headers = this.dataManager.get();
 		JPanel pnlTarget = new JPanel(new MigLayout("ins 5"));
 		pnlTarget.add(new JLabel("Target:"));
-		String[] targetsGender = {"Men", "Women"};
-		JComboBox cmbGender = new JComboBox(targetsGender);
+		String[] targetsGender = {"Men", "Women", "All"};
+		final JComboBox cmbGender = new JComboBox(targetsGender);
 		pnlTarget.add(cmbGender);
-		String[] targetsAge = {"19-23","24-30","31-35"};
-		JComboBox cmbAge = new JComboBox(targetsAge);
+		String[] targetsAge = {"18-23","24-30","31-35", "All"};
+		final JComboBox cmbAge = new JComboBox(targetsAge);
 		pnlTarget.add(cmbAge);
 		JButton btnSubmit = new JButton("Show suggestions");
 		btnSubmit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
+					dataManager.resetWhere();
+
+					String val = (String)cmbGender.getSelectedItem();
+					if (!val.equalsIgnoreCase("All")) {
+						dataManager.where("Gender", val);
+					}
+					val = (String)cmbAge.getSelectedItem();
+					if (!val.equalsIgnoreCase("All")) {
+						dataManager.where("Age_Min", val.substring(0, val.indexOf("-")));
+					}
+
 					Estimator est = Estimator.factory(dataManager.get(), "weka.classifiers.functions.Logistic", Arrays.asList("-R", "1000").toArray(new String[0]));
 					adFactory = new CombinationAdFactory(dataManager);
 					Instances ads = adFactory.all();
