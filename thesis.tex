@@ -45,7 +45,14 @@ The solution has been validated on real-world data from an industrial partner in
 
 \keywords{Online marketing, business intelligence, performance estimation}
 
+\category{D.1.5}{Programming Techniques}{Object-oriented Programming}
+\category{I.2.6}{Artificial Intelligence}{Learning}
 \category{J.1}{Administrative Data Processing}{Marketing}
+
+% ACM's 2012 Classification Scheme. Unsure of how to style, and no one else seems to use it yet.
+%\category{Machine learning}{Learning paradigms}{Supervised learning}
+%\category{Computing methodologies}{Software and its engineering}{Software creation and management}{Designing software}{Software implementation planning}{Software design techniques}
+%\category{Applied Computing}{Operations research}{Marketing}
 
 \section{Introduction}
 As more and more people are using the Internet on a daily basis, the area of online marketing is expanding as a way for organizations to reach large audiences at a relatively low cost. The process of managing the marketing material however requires a lot of manual labor, since results must be properly analyzed and applied to future decisions.
@@ -108,7 +115,7 @@ The basic requirement of a system which could solve the previously stated proble
 
 The proposed solution is to apply the principles of automation described in the MAPE framework to the context of marketing. Monitoring is thus the collection of metrics for online advertisement. To optimize these metrics, the gathered information is analyzed and this analysis forms the basis for the planning of future campaigns to run. Once the plans are completed, they are presented to the operator who can execute them, after which new metrics are gathered and so on.
 
-It is already common for monitoring to be automated, either using custom software or services such as Google Analytics, whereas the other parts of the process are performed manually. It is infeasible to fully automate the whole process, due to for example the creative side of advertisement. There are however certain areas that can be automated and this paper will focus on automated analysis and planning of online marketing campaigns, shown in Figure \ref{fig:MAPEMarketing}.
+It is already common for monitoring to be automated, either using custom software or services such as Google Analytics, whereas the other parts of the process are performed manually. It is infeasible to fully automate the whole process, due to for example the creative side of advertisement including creating new photos and writing new texts. There are however certain areas that can be automated and this paper will focus on automated analysis and planning of online marketing campaigns, shown in Figure \ref{fig:MAPEMarketing}.
 
 \begin{figure}[htb] \centering \includegraphics[width=\columnwidth]{mape-marketing.eps}
 	\caption{Online marketing automation system in control loop}
@@ -116,6 +123,10 @@ It is already common for monitoring to be automated, either using custom softwar
 \end{figure}
 
 A system to automate this process requires monitored data as input, which in this context equals historical data of campaigns and their metrics as mentioned previously. This data is then analyzed and modeled so that an estimated action rate can be estimated based on the properties of the ad. Because Company A only target their ads based on gender, between which there are significant differences in how the ads are designed, targeting will be handled by dividing the full data set into subsets based on the target and then applying the solution to each such subset independently.
+
+An early idea was also to apply tags, or labels, to the images and texts in order to provide more insights useful for the operator. There were however two main problems with this method. First of all, there is the question of subjectivity. This is especially a problem for pictures, whose information content is highly unstructured making the set of possible attributes that are important hard to define. As an example, imagine an ad with a picture of a girl sitting in a coffee shop. A user's likelihood of clicking the ad may either increase or decrease depending on the looks of the girl, the lighting in the room, what beverage the girl is drinking, whether there are other people around or not, etcetera. The subjectivity involved (who decides whether a person is good-looking or not?) and the nearly unlimited possible attributes were the main reasons for ruling out image tagging.
+
+For texts it is possible to remove a lot of the problems with image tagging by only focusing on the actual words that appear. This does however lead to a new problem, which would also have affected image tagging if it was applied despite the concerns raised. Consider the case of two high performing ads, one with the tags "beach" and "volleyball", the other one with tags "snow" and "skiing". Because a classifier is not aware of the context, it would likely estimate that an ad focusing on for example "beach" and "snow" would have a very high click rate, though this is unlikely. Considering that tagging would would easily introduce thousands or millions of possible combinations to be estimated, this would mean the operator would need to do a lot of extra work in ruling out these misguided suggestions and the whole purpose of the system is defeated.
 
 Based on this model, the system will generate suggestions for new campaigns as well as recommend actions to be taken by the operator to optimize the overall average action rate of existing ads.
 
