@@ -37,9 +37,13 @@ public class Exporter
 			writer.newLine();
 			for (Map<String,String> map : values) {
 				String line = this.rowTemplate;
+				// Replace placeholders with values from map
 				for (String key : map.keySet()) {
 					line = line.replaceAll(String.format("\\{%s\\}", key), map.get(key));
 				}
+				// Remove any unused placeholders
+				line = line.replaceAll("\\{.+?\\}", "");
+				// Write to file
 				writer.write(line);
 				writer.newLine();
 				writer.flush();

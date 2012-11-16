@@ -65,10 +65,15 @@ public class GUI extends JFrame
 					JOptionPane.showMessageDialog(GUI.this, "No rows selected.");
 					return;
 				}
+				// Ask for campaign name
+				String campaignName = JOptionPane.showInputDialog(GUI.this, "What is the name of the campaign?");
 				// Create list with a map for each ad
 				List<Map<String,String>> adList = new LinkedList<Map<String,String>>();
 				for (int row : selection) {
 					Map<String,String> adMap = new HashMap<String,String>();
+					if (campaignName != null) {
+						adMap.put("Campaign Name", campaignName);
+					}
 					adMap.put("Body", tableModel.getValueAt(row, tableModel.findColumn("Body")).toString());
 					adMap.put("Image Hash", tableModel.getValueAt(row, tableModel.findColumn("Image_Hash")).toString());
 					String val = (String)cmbGender.getSelectedItem();
@@ -77,15 +82,13 @@ public class GUI extends JFrame
 					}
 					adMap.put("Gender", val);
 					val = (String)cmbAge.getSelectedItem();
-					if (val.equalsIgnoreCase("All")) {
-						adMap.put("Age Min", "");
-						adMap.put("Age Max", "");
-					} else {
+					if (!val.equalsIgnoreCase("All")) {
 						adMap.put("Age Min", val.substring(0, val.indexOf("-")));
 						adMap.put("Age Max", val.substring(val.indexOf("-")+1));
 					}
 					adList.add(adMap);
 				}
+				// Perform export
 				Exporter exp = new Exporter("data/export-template.csv");
 				JFileChooser chooser = new JFileChooser();
 				chooser.setFileFilter(new FileNameExtensionFilter("CSV", "csv"));
