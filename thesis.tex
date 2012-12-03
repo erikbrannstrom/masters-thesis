@@ -17,7 +17,99 @@
 \newcommand{\superscript}[1]{\ensuremath{^{\textrm{#1}}}}
 \newcommand{\subscript}[1]{\ensuremath{_{\textrm{#1}}}}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% some commands for commenting
+\usepackage{ifthen}
+\usepackage{amssymb}
+\usepackage[normalem]{ulem} % for \sout
+\newboolean{showcomments}
+\setboolean{showcomments}{true} % toggle to show or hide comments
+\ifthenelse{\boolean{showcomments}}
+  {
+%\usepackage{showkeys} %Show lables and refs
+\newcommand{\nbb}[2]{
+% \fbox{\bfseries\sffamily\scriptsize#1}
+\fcolorbox{black}{yellow}{\bfseries\sffamily\scriptsize#1}
+{\sf$\blacktriangleright$\textcolor{blue}{\textit{#2}}$\blacktriangleleft$}
+% \marginpar{\fbox{\bfseries\sffamily#1}}
+}
+\newcommand{\version}{\emph{\scriptsize$-$9.2.2011$-$}}
+\newcommand{\remarks}[1]{\color{red}[#1]\color{black}}
+\newcommand{\copied}[1]{\color{green}[#1]\color{black}}
+\newcommand{\modified}[1]{\color{blue}[#1]\color{black}}
+\newcommand{\raw}{$\rightarrow$}
+\newcommand{\ins}[1]{\textcolor{blue}{\uline{#1}}} % please insert
+\newcommand{\del}[1]{\textcolor{red}{\sout{#1}}} % please delete
+\newcommand{\chg}[2]{\textcolor{red}{\sout{#1}}{\raw}\textcolor{blue}{\uline{#2}}} % please change
+\newcommand{\ugh}[1]{\textcolor{red}{\uwave{#1}}} % please rephrase
+  }
+  {
+\newcommand{\nbb}[2]{}
+\newcommand{\remarks}[1]{}
+\newcommand{\modified}[1]{#1}
+\newcommand{\copied}[1]{#1}
+\newcommand{\version}{}
+\newcommand{\ugh}[1]{#1} % please rephrase
+\newcommand{\ins}[1]{#1} % please insert
+\newcommand{\del}[1]{} % please delete
+\newcommand{\chg}[2]{#2} % please change
+  }
+
+\newcommand{\eb}[1]{\nbb{eb}{#1}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \graphicspath{{./include/images/}}
+
+\pgfplotsset{
+    box plot/.style={
+        /pgfplots/.cd,
+        black,
+        only marks,
+        mark=-,
+        mark size=1em,
+        /pgfplots/error bars/.cd,
+        y dir=plus,
+        y explicit,
+    },
+    box plot box/.style={
+        /pgfplots/error bars/draw error bar/.code 2 args={%
+            \draw  ##1 -- ++(1em,0pt) |- ##2 -- ++(-1em,0pt) |- ##1 -- cycle;
+        },
+        /pgfplots/table/.cd,
+        y index=2,
+        y error expr={\thisrowno{3}-\thisrowno{2}},
+        /pgfplots/box plot
+    },
+    box plot top whisker/.style={
+        /pgfplots/error bars/draw error bar/.code 2 args={%
+            \pgfkeysgetvalue{/pgfplots/error bars/error mark}%
+            {\pgfplotserrorbarsmark}%
+            \pgfkeysgetvalue{/pgfplots/error bars/error mark options}%
+            {\pgfplotserrorbarsmarkopts}%
+            \path ##1 -- ##2;
+        },
+        /pgfplots/table/.cd,
+        y index=4,
+        y error expr={\thisrowno{2}-\thisrowno{4}},
+        /pgfplots/box plot
+    },
+    box plot bottom whisker/.style={
+        /pgfplots/error bars/draw error bar/.code 2 args={%
+            \pgfkeysgetvalue{/pgfplots/error bars/error mark}%
+            {\pgfplotserrorbarsmark}%
+            \pgfkeysgetvalue{/pgfplots/error bars/error mark options}%
+            {\pgfplotserrorbarsmarkopts}%
+            \path ##1 -- ##2;
+        },
+        /pgfplots/table/.cd,
+        y index=5,
+        y error expr={\thisrowno{3}-\thisrowno{5}},
+        /pgfplots/box plot
+    },
+    box plot median/.style={
+        /pgfplots/box plot
+    }
+}
 
 \begin{document}
 
@@ -35,7 +127,7 @@ Erik Brännström\\
 \maketitle
 
 \begin{abstract}
-Managing online marketing campaigns is a repetitive and analytical process which is typically done manually by domain experts. This paper deals with the problem of how to use software to manage historical marketing data and use that as a foundation for decision-making with the purpose of optimizing future performance.
+Managing online marketing campaigns is a repetitive and analytical process which is typically done manually by domain experts. This paper deals with the problem of how to use software to manage historical marketing data and use that as a foundation for decision-making with the purpose of optimizing future ad performance.
 
 The solution presented in this thesis involves applying both data mining and automation practices to provide decision makers with knowledge that can be enacted upon. Operators of the system input the historical data, upon which the system creates an estimation model based on said data which is used to estimate the performance of, for the system, previously unseen ads. These suggested ads can either be input by the operator or automatically created by combining existing ad properties.
 
@@ -43,9 +135,9 @@ The solution has been validated on real-world data from an industrial partner in
 
 \end{abstract}
 
-\keywords{Online marketing, business intelligence, performance estimation}
+\keywords{Online marketing, business intelligence, performance estimation, social networks}
 
-\category{D.1.5}{Programming Techniques}{Object-oriented Programming}
+% \category{D.1.5}{Programming Techniques}{Object-oriented Programming}
 \category{I.2.6}{Artificial Intelligence}{Learning}
 \category{J.1}{Administrative Data Processing}{Marketing}
 
@@ -59,7 +151,7 @@ As more and more people are using the Internet on a daily basis, the area of onl
 
 The research in this paper was carried out in association with an industrial partner that relies heavily on online marketing to promote their product to new users. The partner is a social networking company based in Sweden which will be referred to by the name of Company A. The purpose of partnering was to evaluate the prospect of automating parts of the marketing process in a real-world environment and show the validity of the presented solution.
 
-To be able to properly assimilate the contents, the first section of this section presents the problem domain and defines useful terminology which is used throughout this paper. These descriptions are relied on in the subsequent two sections, which first details the addressed problem followed by an overview of the solution.
+To be able to properly assimilate the contents, the first subsection presents the problem domain and defines useful terminology which is used throughout this paper. These descriptions are relied on in the subsequent two sections, which first details the addressed problem followed by an overview of the solution.
 
 The final section deals with the scope by stating restrictions on what will be covered by this paper.
 
@@ -67,23 +159,23 @@ The final section deals with the scope by stating restrictions on what will be c
 This paper exist at the intersection of a number of different areas. As marketing is probably the field furthest from typical software engineering tasks, it will be described in some detail in the first subsection. That will then lead into the concept of business intelligence, followed by a subsection on automation
 
 \subsubsection{Online marketing}
-A site that displays advertisement, the publisher, is often paid by the advertiser based on the number of times visitors see or click on the ads, but it may also be coupled with other requirements, such as that the visitor goes on to buy a product from the advertiser in a given time span. Because advertisers want to pay as little as possible while still getting good results and distributors often preferring to only show relevant information to their visitors to keep them coming back, the advertisement is typically tailored to the expected interests of the visiting user.
+A site that displays advertisement, the publisher, is often paid by the advertiser based on the number of times visitors see or click on the ads, but it may also be coupled with other requirements, such as that the visitor goes on to buy a product from the advertiser in a given time span. The advertisement is generally tailored to the expected interests of the visiting users. This is because advertisers want to keep the costs down while still getting good results and distributors usually prefer to show only relevant information to their visitors to keep them coming back.
 
-A domain description is shown in Figure \ref{fig:MarketingTerminology}. A \emph{marketing campaign}, or simply a \emph{campaign}, is comprised of one or more advertising messages, \emph{ads}, that are directed to one defined audience, the \emph{target} or \emph{target group}. Any ad, and by extension campaign, have numeric measures of success called \emph{metrics}. The most commonly used are \emph{impressions}, which is the number of times an ad has been shown, and clicks.
+A domain description is shown in Figure \ref{fig:MarketingTerminology}. A \emph{marketing campaign}, or simply a \emph{campaign}, is comprised of one or more advertising messages, \emph{ads}, that are directed to one defined audience, the \emph{target} or \emph{target group} (e.g. gender or people searching for certain keywords). Any ad, and by extension campaign, have numeric measures of success called \emph{metrics}. The most commonly used are \emph{impressions}, which is the number of times an ad has been shown, and clicks.
 
-\begin{figure*}[htb] \centering \includegraphics[width=0.8\textwidth]{marketing-uml.eps}
+\begin{figure*}[htb] \centering \includegraphics[width=0.6\textwidth]{marketing-uml.eps}
 	\caption{UML description of marketing terminology.}
 	\label{fig:MarketingTerminology}
 \end{figure*}
 
-When referring to a user interaction, the word \emph{action} will sometimes be used. Even though actions in the case of Company A is the same as clicks, one might be interested in other values than simple clicks such as for example the number of users who go on to register at the site after clicking. Ads have a number of properties, which depend on the media that is used. For example, textual ads in search engines typically have a title, a short text and a URL to which the user is redirected upon clicking the ad, where as an ad on a site such as Facebook can also include an image.
+When referring to a user interaction, the word \emph{action} will sometimes be used. Even though actions in the case of Company A is the same as clicks, one might be interested in other values than simple clicks such as for example the number of users who go on to register at the site after clicking. Ads have a number of properties, which depend on the media that is used. For example, textual ads in search engines typically have a title, a short text and a URL to which the user is redirected upon clicking the ad, whereas an ad on a site such as Facebook can also include an image.
 
 The targeting properties available also depend on the publisher. For the purposes of this thesis, four different classes of online advertising are identified based on the way the ads are targeted. \emph{Search} advertising uses the user's search terms, \emph{social} advertising uses demographic and personal data (e.g. age, gender, location or interests), \emph{contextual} advertising finds keywords on the page on which the ads are displayed or uses manual categorization and finally \emph{non-contextual} advertising, which does no relevancy matching. The separation between these classes is not necessarily distinct and a single publisher can use targeting criteria from different classes. This paper focuses on social advertising and its use by organizations such as Company A.
 
 \subsubsection{Business intelligence}
 Marketing, perhaps especially online, will typically generate large amounts of data. These data sets are then used as a foundation for future decision making. Business intelligence is a rather loosely defined term, but it is highly relevant to this concept of using past data to future decisions.
 
-\cite{Negash2004} defines business intelligence systems as those that ``combine data gathering, data storage, and knowledge management with analytical tools to present complex internal and competitive information to planners and decision makers'', where as \cite{Golfarelli2004} uses the broader definition of ``the process of turning data into information and then into knowledge''. Even though neither definition explicitly mention the use of computers and software for processing the data, it is an integral part of modern business intelligence systems.
+\cite{Negash2004} defines business intelligence systems as those that ``combine data gathering, data storage, and knowledge management with analytical tools to present complex internal and competitive information to planners and decision makers'', whereas \cite{Golfarelli2004} uses the broader definition of ``the process of turning data into information and then into knowledge''. Even though neither definition explicitly mention the use of computers and software for processing the data, it is an integral part of modern business intelligence systems.
 
 The data used in these types of system is generally classified as either structured or semi-structured, as described by \cite{Negash2004}. Though the difference may not always be clear cut, structured data is the type of data which typically resides in databases and custom relationship management (CRM) applications so that it can easily be searched, updated, aggregated, etcetera. Semi-structured data on the other hand is that which cannot be parsed as easily by software, such as e-mails, movies, reports and phone conversations. The author also describes that data can be further categorized based on its source; either internal or external. This framework helps define the data type for which this thesis is relevant, namely internal structured data.
 
@@ -104,9 +196,9 @@ To increase the usability and efficiency of a business intelligence system, it s
 In order for the system to analyze and interact with its environment there is a need for some type of input and output.The input of environmental information are called \textit{sensors} and the output to enact the planned actions are carried out using \textit{effectors}. For the framework to be useful it is not necessary however that these parts, nor the MAPE tasks, are computerized. It is possible to have human interaction integrated into the system description.
 
 \subsection{Problem}
-The current workflow for managing online marketing campaigns starts with the creation of advertising material by the advertiser. Once the ads have been run, their impact is analyzed and based on these results, material can be created, adapted or removed from circulation to better suit the goals of the organization. For example, ads with a low click rate need to either be removed completely or modified in some way in order to increase their efficiency, where as an ad that perform very well most likely is left as is and used as inspiration for new ads.
+The current workflow for managing online marketing campaigns starts with the creation of advertising material by the advertiser. Once the ads have been run, their impact is analyzed and based on these results, material can be created, adapted or removed from circulation to better suit the goals of the organization. For example, ads with a low click rate need to either be removed completely or modified in some way in order to increase their efficiency, whereas an ad that performs very well most likely is left as is and used as inspiration for new ads.
 
-There is a high cost for this repetitive manual labor in terms of both time and money, since the data must be analyzed over and over again. This may not be a problem for small sets of data, but it becomes increasingly hard to maintain as the number of campaigns and ad properties grow over time. Company A, for example, have hundreds of campaigns running at once, each one with a large set of properties, and the amount of historical data grows quickly which means that managing this data becomes cumbersome.
+There is a high cost for this repetitive manual labor in terms of both time and money, since the data must be analyzed over and over again. This may not be a problem for small sets of data, but it becomes increasingly hard to maintain as the number of campaigns and ad properties grow over time. Company A, for example, has hundreds of campaigns running at once and the amount of historical data grows quickly which means that managing this data becomes cumbersome.
 
 The problem is thus one of managing historical advertisement data and applying that data to future decisions in order to optimize the future overall click rate of the organization's ads. In business intelligence terms, the goal is therefore to apply an analytical tool to the stored data in order to provide decision makers with knowledge that can be enacted upon.
 
@@ -122,18 +214,14 @@ It is already common for monitoring to be automated, either using custom softwar
 	\label{fig:MAPEMarketing}
 \end{figure}
 
-A system to automate this process requires monitored data as input, which in this context equals historical data of campaigns and their metrics as mentioned previously. This data is then analyzed and modeled so that an estimated action rate can be estimated based on the properties of the ad. Because Company A only target their ads based on gender, between which there are significant differences in how the ads are designed, targeting will be handled by dividing the full data set into subsets based on the target and then applying the solution to each such subset independently.
-
-An early idea was also to apply tags, or labels, to the images and texts in order to provide more insights useful for the operator. There were however two main problems with this method. First of all, there is the question of subjectivity. This is especially a problem for pictures, whose information content is highly unstructured making the set of possible attributes that are important hard to define. As an example, imagine an ad with a picture of a girl sitting in a coffee shop. A user's likelihood of clicking the ad may either increase or decrease depending on the looks of the girl, the lighting in the room, what beverage the girl is drinking, whether there are other people around or not, etcetera. The subjectivity involved (who decides whether a person is good-looking or not?) and the nearly unlimited possible attributes were the main reasons for ruling out image tagging.
-
-For texts it is possible to remove a lot of the problems with image tagging by only focusing on the actual words that appear. This does however lead to a new problem, which would also have affected image tagging if it was applied despite the concerns raised. Consider the case of two high performing ads, one with the tags "beach" and "volleyball", the other one with tags "snow" and "skiing". Because a classifier is not aware of the context, it would likely estimate that an ad focusing on for example "beach" and "snow" would have a very high click rate, though this is unlikely. Considering that tagging would would easily introduce thousands or millions of possible combinations to be estimated, this would mean the operator would need to do a lot of extra work in ruling out these misguided suggestions and the whole purpose of the system is defeated.
+A system to automate this process requires monitored data as input, which in this context equals historical data of campaigns and their metrics as mentioned previously. This data is then analyzed and modeled so that an estimated action rate can be estimated based on the properties of the ad. Because Company A only targets their ads based on gender, between which there are significant differences in how the ads are designed, targeting will be handled by dividing the full data set into subsets based on the target and then applying the solution to each such subset independently.
 
 Based on this model, the system will generate suggestions for new campaigns as well as recommend actions to be taken by the operator to optimize the overall average action rate of existing ads.
 
 \subsection{Scope}
-Using the MAPE framework in Figure \ref{fig:MAPE}, only the analysis and planning tasks are considered part of this paper, where as monitoring and execution are out of scope. The latter two are however relevant in the verification step, but will not be covered as a research topic. In this context, this means for example that the feature of integrating this system with marketing services to automatically add new ads and campaigns will not be a part of the final system.
+Using the MAPE framework in Figure \ref{fig:MAPE}, only the analysis and planning tasks are considered part of this paper, whereas monitoring and execution are out of scope. The latter two are of course relevant in the implementation of the system, but neither will be covered as a research topic. In this context, this means for example that the feature of integrating this system with marketing services to automatically add new ads and campaigns will not be a part of the final system.
 
-Furthermore, the data set will likely include attributes whose values are free text and images. Text mining and image recognition are beyond the scope of this project. Instead these attributes will be manually categorized, so that the value space is discrete and finite.
+Furthermore, the data set will include attributes whose values are free text and images, however text mining and image recognition are beyond the scope of this project.
 
 The model of the marketing domain purposefully excluded references to costs and budgets. Though the economy of marketing is of great interest to the advertiser, we have assumed that the most important part of the process is to optimize the number of actions. This assumption was approved by our industrial partner.
 
@@ -155,34 +243,36 @@ Finally, section \ref{ch:Conclusion} gives a summary of the results presented in
 \section{Foundations}
 \label{ch:Foundations}
 % Knowledge Discovery
-To facilitate parsing and analyzing data, a number of high-level descriptions of frameworks for knowledge discovery in databases exist \citep{Fayyad1996, Frawley1992} and they exhibit a number of commonalities. These include the importance of having a knowledgeable human operator guiding the process in terms of supplying domain knowledge to the system formulating the goal of the knowledge discovery; feeding discovered knowledge back into the system; and the identification and application of a discovery method, or more specifically the data mining algorithms. Because the solution is a knowledge discovery system, it is important that it too has these same characteristics.
+The problem as well as solution described in the introduction show there is a need to have a software system which can parse and analyze large sets of data. To facilitate this, a number of high-level descriptions of frameworks for knowledge discovery in databases exist \citep{Fayyad1996, Frawley1992} and they exhibit a number of commonalities. These include the importance of having a knowledgeable human operator guiding the process in terms of supplying domain knowledge to the system formulating the goal of the knowledge discovery; feeding discovered knowledge back into the system; and the identification and application of a discovery method, or more specifically the data mining algorithms. Because the solution is a knowledge discovery system, it is important that it too has these same characteristics.
 
 % Data mining
 In data mining, the input to a system can be described using the terms \emph{concepts}, \emph{instances} and \emph{attributes}, where concept is the actual result of the mining, i.e. what we want to be learned; an instance is one single example of data to be mined and can be compared to a row in a database; and attribute is a property of an instance, which in the database analogy is a column \citep{Witten2011}. This analogy is useful since it is directly applicable to the structured internal data the system uses as input, as defined in the introduction.
 
-\cite{Kantardzic2011} gives a top-down explanation of data mining. The learning methods can be divided into two classes; supervised learning and unsupervised learning. In the first case, the learning is based on existing instances and the known values of an dependent variable for each such instance, where as unsupervised learning has no knowledge of such a dependent variable and thus is only concerned with identifying structure in the input data. The structured input data will have such a dependent variable, or at least it can be calculated from existing variables (e.g. the number of clicks divided by the number of impressions gives the average click rate of a campaign). As such, we are definitely dealing with supervised learning.
+\cite{Kantardzic2011} gives a top-down explanation of data mining. The learning methods can be divided into two classes; supervised learning and unsupervised learning. In the first case, the learning is based on existing instances and the known values of a dependent variable for each such instance, whereas unsupervised learning has no knowledge of such a dependent variable and thus is only concerned with identifying structure in the input data. The structured input data will have such a dependent variable, or at least it can be calculated from existing variables (e.g. the number of clicks divided by the number of impressions gives the average click rate of a campaign). This means that we are dealing with supervised learning.
 
-Within supervised learning there exists a number of different types of learning tasks, and \cite{Kantardzic2011} goes on to describe classification as the most common such task. The purpose of a classification algorithm is to categorize an instance into a predefined class, based on existing instances that are already classified. This is not directly applicable to the marketing data, but \citep{Witten2011} describe a special case of classifiers where the outcome is a real number instead of a class. Such classification is referred to as numeric prediction or numeric classification, and this technique is evaluated for use in estimation of action rates for new campaigns. In the case of marketing, another possibility is to use classifiers which provide probabilities of class association as well. By looking at each impression as a trial, each ad has a probability of belonging to the class of being clicked.
+Within supervised learning there are a number of different types of learning tasks, and \cite{Kantardzic2011} goes on to describe classification as the most common such task. The purpose of a classification algorithm is to categorize an instance into a predefined class, based on existing instances that are already classified. This is not directly applicable to the marketing data, but \citep{Witten2011} describe a special case of classifiers where the outcome is a real number instead of a class. Such classification is referred to as numeric prediction or numeric classification, and this technique is evaluated for use in estimation of action rates for new campaigns. In the case of marketing, another possibility is to use classifiers which provide probabilities of class association as well. By looking at each impression as a trial, each ad has a probability of belonging to the class of being clicked.
 
-\section{Related works}
+\section{Related work}
 \label{ch:RelatedWorks}
+There have been some research in methods for estimating the performance of online advertisement, though no such research seems to exist for social network advertisement specifically. We begin by looking at related work for ad performance estimation in search advertisement, followed by techniques for improving, though not estimating, performance. Finally we describe research concerning how users experience ads and potential problems caused by fake traffic.
+
 \cite{Richardson2007} describe a model for predicting the click-through rates of ads given a set of properties in the context of search engine advertisement. For the estimation, the authors use logistic regression on a large number of ad features (e.g. number of characters in text and segments in URL). This approach is chosen in the paper because logistic regression provides a probability for class association, and a click probability is the goal. There is however no further discussion or experimentation to elicit why this choice is more appropriate than for example numeric classifiers. The results are nevertheless promising in regard to the predictive powers of logistic regression and as such it will be evaluated as a potential estimation model in this paper.
 
-Another paper on predicting click-through rate (CTR) is \cite{Regelson2006}, where a cluster analysis approach is used. In order to estimate the CTR of a search term, a number of related search terms with known performance are identified and used as a basis for the prediction. Though the method performs well, it is tightly bound to the field of search engine advertisement. The same can be said for \cite{Richardson2007}, which for example utilize correlation between search terms to improve estimates. Because the concept of search terms does not exist in social networking advertisement, neither approach is directly applicable.
-
-In online advertisement there have been problems of so called click-spam or click-fraud, meaning that the number of clicks on ads is increased in a fraudulent manner, for example using bots. \cite{Dave2012} provides a methodology to measure click-spam in their networks as well as a study of the severity of the problem on different classes of networks. Their results show that established search advertising on for example Google and Bing is fairly accurate in their filtering of click-spam, where as the problem is  greater for contextual and social advertisement, and severe for mobile advertisement. A related paper by \cite{Zhang2011} describes a methodology for advertisers to evaluate the quality of click traffic and use this to assess the difference in quality between bulk traffic vendors and established pay-per-click networks. It may be of importance to be aware of these issues as they could carry some impact on the research, however managing traffic quality and click-spam is not in the scope of this paper.
-
-Research has also shown that using targeted advertisement is effective given that the ad is not experienced as being obtrusive, though obtrusive ads that are not targeted also increase performance \citep{Goldfarb2011}. Another study presented results that suggest that users on social networks generally tend to not consciously take notice of advertisement and, perhaps of this meaning that ads are not considered to be obtrusive, they do not have any negative feelings toward the existence of advertising \citep{Hadija2012}. By automating the process of estimating ad performance, these properties for ad management are expected to be implicitly handled by the model, since properties that make users experience the ad as obtrusive or unnoticeable will perform worse and thus those results will impact future estimates.
+Another paper on predicting click-through rate (CTR) is \cite{Regelson2006}, where a cluster analysis approach is used. In order to estimate the CTR of a search term, a number of related search terms with known performance are identified and used as a basis for the prediction. Though the method performs well, it is tightly bound to the field of search engine advertisement. The same can be said for \cite{Richardson2007}, which for example utilizes correlation between search terms to improve estimates. Because the concept of search terms does not exist in social networking advertisement, neither approach is directly applicable.
 
 Automation in marketing is not a completely novel idea. \cite{Joshi2006} present a technique for automatically finding related keywords for broader targeting of ads by creating a graph of search terms based on the domain knowledge contained in search engines. Continuation of that work is that of \cite{Thomaidou2011}, where keywords are also extracted from the landing page to further improve the results. Both approaches are however only relevant for contextual and search engine advertisement as they use data exclusive to the respective advertisement class.
 
 Marketing in the context of social media has also gained interest in the academic community. \cite{Yang2006} propose a technique for identifying subgroups of users in social networks based on their interactions and then use that information to create targeted advertising. The results could very well be applied in parallel to the results of this thesis in order to better target ads, however it does not deal with ad performance in any way.
 
+Research has also shown that using targeted advertisement is effective given that the ad is not experienced as being obtrusive, though obtrusive ads that are not targeted (i.e. non-contextual) also increase performance \citep{Goldfarb2011}. Another study presented results that suggest that users on social networks generally tend to not consciously take notice of advertisement and, perhaps of this meaning that ads are not considered to be obtrusive, they do not have any negative feelings toward the existence of advertising \citep{Hadija2012}. By automating the process of estimating ad performance, these properties for ad management are expected to be implicitly handled by the model, since properties that make users experience the ad as obtrusive or unnoticeable will perform worse and thus those results will impact future estimates.
+
+In online advertisement there have been problems of so called click-spam or click-fraud, meaning that the number of clicks on ads is increased in a fraudulent manner, for example using bots. \cite{Dave2012} provides a methodology to measure click-spam in their networks as well as a study of the severity of the problem on different classes of networks. Their results show that established search advertising on for example Google and Bing is fairly accurate in their filtering of click-spam, whereas the problem is greater for contextual and social advertisement, and severe for mobile advertisement. A related paper by \cite{Zhang2011} describes a methodology for advertisers to evaluate the quality of click traffic and use this to assess the difference in quality between bulk traffic vendors and established pay-per-click networks. It may be of importance to be aware of these issues as they could carry some impact on the research, however managing traffic quality and click-spam is not in the scope of this paper.
+
 In conclusion, though predicting performance of ads has seen some limited research, the area of social networking advertisement is largely unexplored, especially in terms of performance prediction.
 
 \section{Method}
 \label{ch:Method}
-This section describes the process that was used to identify a solution to the main research question. The first step of the process was a literature review to identify existing research in this area and examine the foundations. Simultaneously, meetings were held with marketing experts from Company A to define the domain in which to apply the results of the project.
+This section describes the process that was used to identify a solution to the problem described in the introduction. The first step of the process was a literature review to identify existing research in this area and examine the foundations. Simultaneously, meetings were held with marketing experts from Company A to define the domain in which to apply the results of the project.
 
 The next step was obtaining a sample of real world marketing data for analysis and experimentation. This process began with manual analysis and then formalized experiments to confirm the idea that the data could be modeled in order to provide better-than-random estimates. Once that had been established, the appropriate choice of classifier was evaluated.
 
@@ -194,12 +284,12 @@ The last subsection in this section describes the sample data provided by Compan
 
 \subsection{Research questions}
 \label{sec:ResearchQuestions}
-In formulating the research questions, the definitions provided by \cite{Shaw2002} were used in order to provide clear goals for what thesis should provide.
+In formulating the research questions, the definitions provided by \cite{Shaw2002} were used in order to provide clear goals for what the thesis should provide.
 
 \textit{\textbf{RQ 1.} How to automate the creation and estimation of good ads in online marketing?}
-The main research question for this thesis is the identification of a method of development that can be used in organizations to support decisions in online marketing. The solution presented is a procedure that is applicable to online advertisers. To validate the correctness of the procedure, a statistical experiment was designed to analyze its performance.
+The main research question for this thesis is the identification of a method of development that can be used in organizations to support decisions in online marketing. The solution presented is a procedure that is applicable to online advertisers.
 
-Because this question is very general, four sub-questions were formulated which guided the development of the main solution.
+Because this question is very broad, the validation step consisted of dividing the question into four sub-questions and validating them each in turn.
 
 \textit{\textbf{RQ 1.1.} Do ad properties have differing impact on performance?}
 It would be reasonable to assume that different properties of an ad may have different impact on the user it is shown to in terms of likelihood of him or her taking an action, however the size of those differences are harder to hypothesize about. This is an important first question in order to get an indication of how, if at all, properties relate to the click rate.
@@ -209,7 +299,7 @@ To answer the question, a controlled experiment was defined were ad properties w
 \textit{\textbf{RQ 1.2.} How well do classifiers perform in estimating click rates?}
 The first step is to identify whether or not a numerical classifier can, based on historical data, adequately estimate the action rate of previously unseen ads. It is thus a matter of evaluating the performance of existing algorithms.
 
-To provide an answer to the question an experiment was defined, where success rate of regression models are compared to those of random values from statistical distributions, one normally distributed and one uniform distribution with the same minimum and maximum values as the data set. The results answer both how well a numerical classifier performs in relation to simpler models, and if it performs better, which classifier is most suited for the task.
+To provide an answer to the question an experiment was defined, where the success rate of a regression model was compared to those of random values from statistical distributions, one normally distributed and one uniform distribution with the same minimum and maximum values as the data set, as well as comparing success rates of different classifiers to each other. The results answer both how well classifiers perform in relation to simpler models, and if they performs better, which classifier is most suited for the task.
 
 \textit{\textbf{RQ 1.3.} Which ad selection strategy provides the highest average click rate?}
 It is unlikely that a classifier would correctly estimate future ad performance every time. To potentially minimize the impact of bad estimations, multiple suggested ads could be selected by the operator and run together in order to improve the average action rate.
@@ -222,7 +312,7 @@ A marketing executive suggested that the performance of ads declines over time. 
 \subsection{Data set}
 The main data set used for analysis and experiments was provided by Company A and consisted of ads run in the Polish market between July 17\superscript{th} and August 17\superscript{th} 2012. The set contained 959 instances of ads run on Facebook in the mentioned time interval. All ads had however not been run for the whole time.
 
-There were a total of eight (8) unique titles, but six of those where almost equal with only difference being the city they referred to. The body texts had three (3) distinct values, and by counting the titles referring to a city as a single title, every title was used exclusively together with a single body text so that only three possible title/body combinations existed. A total of eleven (11) unique images were used, out of which five (5) were used when targeting both genders and each gender having three (3) exclusive images. Figure \ref{fig:AdLayout} shows the typical layout for these ads, with the title above the image and the body text to the right of the image.
+There were a total of eight (8) unique titles, but six of those where almost equal with only difference being the city they referred to. The body texts had three (3) distinct values, and by counting the titles referring to a city as a single title, every title was used exclusively together with a single body text so that only three possible title/body combinations existed. A total of eleven (11) unique images were used, out of which five (5) were used when targeting both genders and each gender having three (3) exclusive images. Figure \ref{fig:AdLayout} shows the layout used by Facebook, with the title above the image and the body text to the right of the image. This layout is fixed and cannot be modified by the operator, who can only set the individual properties for the ad (and of course also targeting properties).
 
 \begin{figure}[htpb]
 	\centering
@@ -231,19 +321,23 @@ There were a total of eight (8) unique titles, but six of those where almost equ
 	\label{fig:AdLayout}
 \end{figure}
 
-The average number of impressions for the ads in the data set was 143875.17 and the average number of clicks was 32.96, both values with two decimals of precision. By dividing the clicks with the impressions we get an average click-through rate of about 0.0229\%.
+The average number of impressions for each ad in the data set was 143875.17 and the average number of clicks was 32.96, both values with two decimals of precision. By dividing the clicks with the impressions we get an average click-through rate of about 0.0229\%.
 
-Due to changes to the marketing strategy of Company A over the course of this project, the data set was adapted to match their new approach. The most noticeable difference was the removal of distinct age groups for targeting, which left gender as the only targeting property. To still be able to use the data set, the metrics of campaigns that only differed in the targeted age group were aggregated. Other changes to the strategy included using the same title on all ads and changing the regions in which marketing took place. This aggregation reduced the number of unique instances to 64.
+Over the course of this project, Company A made some changes to their marketing strategy. The most noticeable difference was the removal of distinct age groups for targeting, which left gender as the only targeting property. To still be able to use the data set, the metrics of campaigns that only differed in the targeted age group were aggregated. This aggregation reduced the number of unique instances to 64. Other changes to the strategy included using the same title on all ads and changing the regions in which marketing took place, however the data set was not adapted to reflect these changes since those changes could not be simulated using for example aggregation.
+
+An early idea on how to modify the data to provide more insights for the operator was to apply tags to the images and texts. Tags are a set of words that describe an object, so that similarities can be discerned more easily by a computer system. There were however two main problems with this method. First of all, there is the question of subjectivity. This is especially a problem for pictures, whose information content is highly unstructured making the set of possible attributes that are important hard to define. As an example, imagine an ad with a picture of a girl sitting in a coffee shop. A user's likelihood of clicking the ad may either increase or decrease depending on the looks of the girl, the lighting in the room, what beverage the girl is drinking, whether there are other people around or not, etcetera. The subjectivity involved (who decides whether a person is good-looking or not?) and the nearly unlimited possible attributes were the main reasons for ruling out image tagging.
+
+For texts it is possible to remove a lot of the problems with image tagging by only focusing on the actual words that appear. This does however lead to a new problem, which would also have affected image tagging if it was applied despite the concerns raised. Consider the case of two high performing ads, one with the tags "beach" and "volleyball", the other one with tags "snow" and "skiing". Because a classifier is not aware of the context, it would likely estimate that an ad focusing on for example "beach" and "snow" would have a very high click rate, though this is unlikely. Also considering that tagging could easily introduce thousands or millions of possible combinations to be estimated, this would mean the operator would need to do a lot of extra work in ruling out these misguided suggestions and the whole purpose of the system would be defeated.
 
 A visual analysis of a graph of the click rates hinted of a normal distribution. To judge whether this was the case, the extended Shapiro-Wilks normality test \citep{Royston1982} as implemented in R\footnote{http://www.r-project.org/} was used. Ads that had not received any clicks were considered to be outliers and removed from the sampling to not skew the results. This turned out to only affect a single ad.
 
 A significance level, \(\alpha\), of 0.05 was chosen for the null hypothesis \(H_0\), which would mean the data is normal. The test returned the test statistic \(W = 0.9654\) and a p-value of 0.07339. Since \(0.07339 > \alpha\), we cannot reject \(H_0\) and therefore we assume a normal distribution of the data set.
 
-When no specification is made in regard to which data set was used for a specific experiment, it is implied that the results are based on the part of the aggregated data set which targeted women. Though all experiments have been run on both subsets, we have chosen to only give the results of one set as long as the results do not differ.
+When no specification is made in regard to which data set was used for a specific experiment, it is implied that the results are based on the part of the aggregated data set which targeted women. Though all experiments have been run on both subsets, we have chosen to only give the results of one set as long as the conclusions of the results are the same.
 
 \section{Solution}
 \label{ch:Solution}
-The proposed solution to the problem is to automate the creation of good ads for online marketing using a software system. Figure \ref{fig:SWArchitecture} gives an overview of the architecture for such a system. The main components include a data manager for interacting with the knowledge base, an estimator that based on historical data can estimate the performance of new ads and an ad factory that can provide new ads with unknown performance to, for example, and estimator.
+The proposed solution to the problem is to automate the creation of good ads for online marketing using a software system. Figure \ref{fig:SWArchitecture} gives an overview of the architecture for such a system. The main components include a data manager for interacting with the knowledge base, an estimator that based on historical data can estimate the performance of new ads and an ad factory that can provide new ads with unknown performance to, for example, an estimator.
 
 \begin{figure}[htpb]
 	\centering
@@ -252,7 +346,7 @@ The proposed solution to the problem is to automate the creation of good ads for
 	\label{fig:SWArchitecture}
 \end{figure}
 
-In order to answer the research questions the estimator, which is the central part of the system, must be evaluated. By having an evaluator which controls the interfaces to and from the estimator as in Figure \ref{fig:SWEvaluator}, we can create a number of different evaluators to test different aspects of the estimation.
+In order to answer the research questions, the estimator, which is the central part of the system, must be evaluated. By having an evaluator which controls the interfaces to and from the estimator as in Figure \ref{fig:SWEvaluator}, we can create a number of different evaluators to test different aspects of the estimation.
 
 \begin{figure}[htpb]
 	\centering
@@ -261,9 +355,7 @@ In order to answer the research questions the estimator, which is the central pa
 	\label{fig:SWEvaluator}
 \end{figure}
 
-Because the evaluator controls the input, ads whose performance is known can be input to the application and its output compared to the actual values. By repeating such an experiment many times but change the data set used, we get a reliable indicator of how well an estimator performs. The result can also be compared for different estimators to identify which is the best choice, which is exactly what was done for the experiment in section \ref{ssec:Classifier}.
-
-The components described in the diagram are basically the main interfaces used for interaction between classes, and were used as the basis for the class diagram presented in Figure \ref{fig:ClassDiagram}.
+Because the evaluator controls the input to the evaluator component, ads whose performance is known can be input to the application and its output compared to the actual values. This comparison is useful for gaining insight into how well the estimates reflect reality. More specifically, by repeating such an experiment many times but change the data set used, we get a reliable indicator of how well an estimator performs, namely the percentage of trials for which the estimate was reasonably close to the actual value. This of course requires a definition of what reasonably close means, something which will be covered in section \ref{ssec:Classifier}. These indicator values can also be compared for different estimators to identify which is the most accurate one, which is also done in the mentioned section.
 
 \begin{figure}[htb]
 	\centering
@@ -272,11 +364,11 @@ The components described in the diagram are basically the main interfaces used f
 	\label{fig:ClassDiagram}
 \end{figure}
 
-First of all, it is important to know that the developed system takes advantage of the Weka library by using its classes for modeling the data sets and its implementations of classifiers. It also uses the Colt library for dealing with statistical distributions.
+It is important to know that the developed system takes advantage of the Weka library \citep{Garner1995} by using its classes for modeling the data sets and its implementations of classifiers. It also uses the Colt library\footnote{http://acs.lbl.gov/software/colt/} for dealing with statistical distributions.
 
 The Data package defines the main classes that model the data. The main purpose of \textit{Ads} is to manage a list of single \textit{Ad} objects that all store the same type of information. It is data from these classes that is used by the logic in the Core package.
 
-The main interface in Core is the \textit{Estimator}, whose purpose it is to predict the performance of an ad whose performance is not known. The different realizations of this interface represents different methods of prediction, with the NumericEstimator utilizing numeric classifiers, the NominalEstimator returns the probability that the ad belongs to the class of clicked ads, and the DistributionEstimator uses statistical distributions to randomly assign a prediction.
+The main interface in Core is the \textit{Estimator}, whose purpose it is to predict the performance of an ad whose performance is not known. The different realizations of this interface represents different methods of prediction, with the \textit{NumericEstimator} utilizing numeric classifiers, the \textit{NominalEstimator} returns the probability that the ad belongs to the class of clicked ads, and the \textit{DistributionEstimator} uses statistical distributions to randomly assign a prediction.
 
 An AdFactory is basically a provider of ads which do not have an estimated action rate. The source of these ads can be for example combinations of ad properties for which no metrics exist, or suggestions input by an operator. The realization of this interface is closely tied to the environment in which the system will exist.
 
@@ -289,26 +381,26 @@ This overview of components and classes has explained how the software was desig
 \subsection{Knowledge base}
 The data manager was mentioned as the component which interacts with the knowledge base. The knowledge base contains all historical data used by the system and must thus not only be able to provide data, but also be updatable. The actual contents of the knowledge base should be limited to only the data which is used by the other components to conserve space, unless that specification of what is useful and not is likely to change.
 
-An efficient way of storing the structured data that we are dealing with is a database. By storing only the necessary data in a database and updating it whenever new monitored metrics are available, not only is the data manager's task simplified but the data can also be queried from outside the system which avoids lock-in of data, something that could be a problem for some organizations.
+An efficient way of storing the structured data that we are dealing with is a database, and was also the solution used in our implementation. By storing only the necessary data in a database and updating it whenever new monitored metrics are available, not only is the data manager's task simplified but the data can also be queried from outside the system which avoids lock-in of data, something that could be a problem for some organizations.
 
 \subsection{Impact of properties}
-To show whether different properties carry different weight in regard to how well an ad performs was an important first step in order to get an indication of the potential merits of modeling the data. For example, if an ad consists of an image and a text, are the choices of image and text equally important in the search of a high-performing ad or does one carry a stronger influence on the final result than the other? Or even more importantly, if the properties carry no correlation to the click-rate, that would imply performance has nothing to do with the ad properties defined by the advertiser. To measure this we use the Pearson coefficient of correlation, which is defined as
+To show whether different properties carry different weight in regard to how well an ad performs was an important first step in order to get an indication of the potential merits of modeling the data. For example, if an ad consists of an image and a text, are the choices of image and text equally important in the search of a high-performing ad or does one carry a stronger influence on the final result than the other? Or even more importantly, if the properties carry no correlation to the click-rate, that would imply performance has nothing to do with the ad properties defined by the advertiser.
+
+Domain experts from two geographical markets, Brazil and Argentina, were asked to choose three that they had previously run in their market which they identified as representative of high, average and low performance respectively. The three performance levels were chosen to get a baseline performance as well as more extreme values in both directions. The selection was done for men and women separately, so a total of six ads were selected for each region. It is important to note that these were existing ads, so while they performed differently the choice of for example the lowest performing ad was not a manufactured ad whose purpose was to perform badly (e.g. by selecting an offensive image). Finally combinations of the three images and three texts within each region and gender were formed and put online.
+
+The budget for the experiment was 720 USD, or 20 USD per ad. For Brazil this generated an average of 179124 impressions and 77 clicks, and for Argentina those numbers were 382791 and 126 respectively. Once the budget was spent, the results were collected and the correlation coefficient was calculated for each property and the resulting click rate. Each regions data set was also split by gender to see differences between target groups. Finally, the data was gathered and the correlation was calculated. We used the Pearson coefficient of correlation \cite{Milton2002}, which is defined as
 
 \begin{equation}
 	\rho = \frac{Cov(X, Y)}{\sqrt{(Var X)(Var Y)}}
 \end{equation}
 
-Because the covariance and variance are unknown they have to be estimated based on the sample.
+In our case, the random variables \(X\) and \(Y\) represent the choice of value for a given property and the click rate respectively. Because the covariance and variance are unknown they have to be estimated based on the sample.
 
 \begin{equation}
 	\hat{\rho} = \frac{\widehat{Cov(X, Y)}}{\sqrt{(\widehat{Var X})(\widehat{Var Y})}} = \frac{ \sum_{i=1}^{n} (X_i - \bar{X})(Y_i - \bar{Y}) }{ \sqrt{ (\sum_{i=1}^{n} (X_i - \bar{X})^2) (\sum_{i=1}^{n} (Y_i - \bar{Y})^2) } }
 \end{equation}
 
-Because \(-1 \leq \hat{\rho} \leq 1 \), though we are only interested in the magnitude of the correlation and not the direction, \(|\hat{\rho}|\) is the value used for comparison. The interpretation of this value is that if it is 1 there is an exact linear correlation between the two random variables where as 0 means there is no linear correlation at all.
-
-Domain experts from two geographical markets, Brazil and Argentina, were asked to choose three ads that they had previously run in their market which they identified as representative of high, average and low performance respectively. It is important to note that these were existing ads, so while they performed differently the choice of for example the lowest performing ad was not a manufactured ad which purpose was to perform badly (e.g. by selecting an offensive image). Finally combinations of the three images and three texts from each region were formed and put online.
-
-The budget for the experiment was 720 USD, or 20 USD per ad. For Brazil this generated an average of 179124 impressions and 77 clicks, and for Argentina those numbers were 382791 and 126 respectively. Once the budget was spent, the results were collected and the correlation coefficient was calculated for each property and the resulting click rate. Each regions data set was also split by gender to see differences between target groups. The results are presented in Figure \ref{fig:PropertyImpact}.
+Because we are only interested in how big the impact is of different properties and not if said impact is positive or negative, it is the magnitude of the correlation which is important and not the direction. Since \(-1 \leq \hat{\rho} \leq 1 \), we therefore used the absolute value \(|\hat{\rho}|\) for comparison. As an example, even if the correlation for a property is near -1, the conclusion is still that it has a large impact on the performance. In other words, the interpretation of \(|\hat{\rho}|\) is that if it is 1 there is an exact linear correlation between the two random variables whereas 0 means there is no linear correlation at all. The results of the experiment are presented in Figure \ref{fig:PropertyImpact}.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -340,10 +432,12 @@ The budget for the experiment was 720 USD, or 20 USD per ad. For Brazil this gen
 
 The results clearly show that the impact of the choice of image is larger than that of the choice of text. Most notable are perhaps the correlation values for men in Brazil and women in Argentina where the image is of utmost importance, as well as the result that women in Brazil are the only group where the text has a higher impact than the image.
 
-These results provide an answer RQ 1.1, as there is a large difference in the impact of the two properties used in this example.
+Because of the large differences, the results were discussed with one of the domain experts involved in the ad selection. Overall he considered the results to be in line with his expectations, even though the high correlation between text and CTR for women in Brazil and men in Argentina were slightly higher than he would have guessed. A suggested reason for this was that the gender of the domain expert in each region was the opposite of the gender for which the texts were more important than expected (i.e. a heterosexual man is better at selecting high performing images of women and vice versa). Because of this, further experiments will be made at Company A to compare image selection between men and women, however those experiments will not be part of this paper.
+
+The results nonetheless provide an answer to RQ 1.1, as there is a noticeable difference in the impact of the two properties used in this example.
 
 \subsection{Rate estimation}
-The working hypothesis was that a numerical classifier could estimate the action rate of new ads sufficiently well. By manual experimentation with the data set and the machine learning suite Weka \citep{Garner1995}, a support vector regression algorithm called Sequential Minimal Optimization (SMO) was identified as a good candidate for further experimentation.
+The working hypothesis was that a numerical classifier could estimate the action rate of new ads sufficiently well. By manual experimentation with the data set in the Weka workbench, a support vector regression algorithm called Sequential Minimal Optimization (SMO) was identified as a good candidate for further experimentation.
 
 The experiment was designed as follows. Initially, the data set was randomly split into two separate, non-overlapping sets called training and validation. The training set was then used to create the regression model, after which the action rate of the validation instances was estimated. For each such estimate, an estimate was considered successful if the following inequality held true.
 
@@ -353,7 +447,7 @@ The experiment was designed as follows. Initially, the data set was randomly spl
 
 \(c_i\) is the actual action rate for ad i in the validation set and \(\hat{c}_i\) is the estimated value. The tolerance limit is defined as \(\epsilon = k*\bar{c}\), where \(k\) is a constant between 0 and 1. This process was repeated 5000 times and both the total number of estimations as well as the number of successful estimations were counted. From this a success percentage was calculated for different values of \(k\).
 
-For comparison, the same process was also applied with two simple statistical models of the training set. The simplest model was defining a uniform distribution between the minimum and maximum values in the data set, and the slightly more advanced model assumed a normal distribution. The estimations from these models were then made by drawing a random value from the distribution. Table \ref{tbl:EstimationSuccess} and Figure \ref{fig:EstimationSuccess} show the results of the experiment for all three models.
+For comparison, the same process was also applied with two simple statistical models of the training set. The simplest model was defining a uniform distribution between the minimum and maximum values in the data set, and the slightly more advanced model assumed a normal distribution. The latter was used due to our previous assumption that the data is in fact normally distributed. The estimations from these models were then made by drawing a random value from the distribution. Table \ref{tbl:EstimationSuccess} and Figure \ref{fig:EstimationSuccess} show the results of the experiment for all three models.
 
 \begin{table}[htbp]
 \begin{center}
@@ -377,14 +471,14 @@ For comparison, the same process was also applied with two simple statistical mo
 	    ybar,
 	    enlargelimits=0.15,
 	    legend pos=north west,
-	    ylabel={Sucess rate (\%)},
+	    ylabel={Sucess rate},
 	    xlabel={k},
 	    symbolic x coords={0.01,0.05,0.10,0.20},
 	    xtick=data,
 	    ]
-	\addplot coordinates {(0.01, 1.505) (0.05, 7.405) (0.10, 14.315) (0.20, 29.74)};
-	\addplot coordinates {(0.01, 2.55) (0.05, 12.99) (0.10, 25.72) (0.20, 48.50)};
-	\addplot coordinates {(0.01, 1.84) (0.05, 14.66) (0.10, 34.19) (0.20, 72.955)};
+	\addplot coordinates {(0.01, 0.01505) (0.05, 0.07405) (0.10, 0.14315) (0.20, 0.2974)};
+	\addplot coordinates {(0.01, 0.0255) (0.05, 0.1299) (0.10, 0.2572) (0.20, 0.4850)};
+	\addplot coordinates {(0.01, 0.0184) (0.05, 0.1466) (0.10, 0.3419) (0.20, 0.72955)};
 	\legend{Uniform,Normal,SMO}
 	\end{axis}
 	\end{tikzpicture}
@@ -430,7 +524,7 @@ As \(k\) increases it becomes clear that the regression model is noticeably bett
 \label{ssec:Classifier}
 Even though the SMO algorithm performed well for estimation, the choice of algorithm was mainly an educated guess. As  different classifiers tend to be best suited for different situations, the estimation experiment was revisited to identify the best choice of classifier for this purpose. The only difference was that for this experiment the statistical distributions were replaced with additional classifiers from the Weka library. Each classifier was still evaluated 5000 times, but this time for \(k \in \{0.01, 0.02, ..., 0.20\} \).
 
-All numerical classifiers from the library were explored. Besides the previously mentioned SMO algorithm, the classifiers used were standard linear regression (\textit{LinearRegression}), a model tree that can have linear models at the leaves (\textit{M5P}), an extension of the nearest neighbor approach called instance-based learning (\textit{IBk}), a back-propagation classifier (\textit{MultilayerPerceptron}) and a regression tree (\textit{REPTree}). In addition to this, the library's logistic regression implementation (\textit{Logistic}) was evaluated. Figure \ref{fig:ClassifierComparison} shows the results.
+All numerical classifiers from the library were explored. Besides the previously mentioned SMO algorithm, the classifiers used were standard linear regression (\textit{LinearRegression}), a model tree that can have linear models at the leaves (\textit{M5P}), an extension of the nearest neighbor approach called instance-based learning (\textit{IBk}), a back-propagation classifier (\textit{MultilayerPerceptron}) and a regression tree (\textit{REPTree}) \cite{Witten2011}. In addition to this, the library's logistic regression implementation (\textit{Logistic}) was evaluated. Figure \ref{fig:ClassifierComparison} shows the results.
 
 \begin{figure}[htpb]
 \begin{center}
@@ -446,7 +540,9 @@ All numerical classifiers from the library were explored. Besides the previously
 			xtick={0,0.05,0.10,0.15,0.20},
 			xticklabels={$0$, $0.05$, $0.10$, $0.15$, $0.20$},
 			xmin=0.0,
-			xmax=0.21
+			xmax=0.21,
+			xlabel={k},
+			ylabel={Sucess rate}
 		]
 
 		\addplot coordinates {(0.01, 0.042250) (0.02, 0.103900) (0.03, 0.143100) (0.04, 0.191450) (0.05, 0.258550) (0.06, 0.322050) (0.07, 0.381950) (0.08, 0.421950) (0.09, 0.448400) (0.10, 0.488400) (0.11, 0.517450) (0.12, 0.527050) (0.13, 0.551250) (0.14, 0.561950) (0.15, 0.573750) (0.16, 0.595600) (0.17, 0.607500) (0.18, 0.637450) (0.19, 0.691700) (0.20, 0.711450)};
@@ -481,12 +577,106 @@ All numerical classifiers from the library were explored. Besides the previously
 \end{center}
 \end{figure}
 
-Because the increase of the success rate is not exactly linear, there is no clear best choice at first glance. However, because there is little use for an operator to be told that there is less than a 50\% chance that an estimated interval is correct, since such a statement would imply that it is in fact more likely that the real value lies outside the interval than within, we can focus on the parts of the graphs above that threshold. Above the 50\%-line there are only two classifiers that at some point have the highest success rate, the logistic regression and the REPTree. The rates of these classifiers follow each other closely up to \(k=0.15\), at which point the latter no longer increases in accuracy. Based on this, the choice of classifier falls on the logistic regression.
+Because the increase of the success rate is not exactly linear, there is no clear best choice at first glance. However, because there is little use for an operator to be told that there is less than a 50\% chance that an estimated interval is correct, since such a statement would imply that it is in fact more likely that the real value lies outside the interval than within, we can focus on the parts of the graphs above that threshold. Above the 50\%-line there are only two classifiers that at some point have the highest success rate, the logistic regression and the REPTree. The rates of these classifiers follow each other closely up to \(k=0.15\), at which point the latter no longer increases in accuracy.
+
+Based on these results, we then selected the four classifiers with the highest success rates above the 50\% threshold to run additional experiments on. The first one was to analyze in more detail the size of the estimation errors. To do this, the same experiment as before was run, but instead of calculating success rates we instead calculated the mean squared error over 5000 runs. The results are presented in Figure \ref{fig:ClassifierMSQE}. The box contains the values between the 25\superscript{th} and 75\superscript{th} percentiles with the line inside marking the median value. The bottom and top whiskers show the 10\superscript{th} and 90\superscript{th} percentile respectively.
+
+\begin{figure}[htpb]
+\begin{center}
+	\begin{tikzpicture}
+	\begin{axis} [xtick=data, symbolic x coords={IBk,REPTree,Logistic,SMOReg},
+  table/header=false]
+	    \addplot [box plot median] table {msqe.dat};
+	    \addplot [box plot box] table {msqe.dat};
+	    \addplot [box plot top whisker] table {msqe.dat};
+	    \addplot [box plot bottom whisker] table {msqe.dat};
+	\end{axis}
+	\end{tikzpicture}
+
+	\caption{Mean square error for classifiers with highest success rate}
+	\label{fig:ClassifierMSQE}
+\end{center}
+\end{figure}
+
+\eb{Discuss MSQE results.}
+
+There is however another aspect of classifiers that is interesting to analyze further before drawing any final conclusions, namely performance. The four classifiers with the highest success rates above the 50\% threshold were analyzed from a timing point of view. The results are in Figure \ref{fig:ClassifierPerformanceCombinations}, where the time measured in milliseconds is shown on a logarithmic scale.
+
+\begin{figure}[htb]
+\begin{center}
+	\begin{tikzpicture}
+	\begin{semilogyaxis}[
+			legend pos=north west,
+			xlabel={N},
+			ylabel={Time (ms)},
+			ymin=1,
+			ymax=10000000,
+			clip=true
+		]
+		\addplot coordinates {(10, 57.666666666666664) (20, 139.33333333333334) (30, 417.6666666666667) (40, 1129.6666666666667) (50, 2838.3333333333335) (60, 5429.666666666667) (70, 7355.0) (80, 15995.333333333334) (90, 20474.666666666668) (100, 21176.0) };
+		\addlegendentry{Logistic}
+
+		\addplot coordinates {(10, 13.333333333333334) (20, 7.666666666666667) (30, 11.666666666666666) (40, 15.666666666666666) (50, 10.666666666666666) (60, 10.666666666666666) (70, 13.0) (80, 15.666666666666666) (90, 13.333333333333334) (100, 17.666666666666668) };
+		\addlegendentry{REPTree}
+
+		\addplot coordinates {(10, 17.333333333333332) (20, 12.333333333333334) (30, 7.333333333333333) (40, 10.666666666666666) (50, 9.333333333333334) (60, 14.666666666666666) (70, 16.0) (80, 21.666666666666668) (90, 31.666666666666668) (100, 41.0) };
+		\addlegendentry{IBk}
+
+		\addplot coordinates {(10, 65.0) (20, 122.33333333333333) (30, 703.3333333333334) (40, 3123.6666666666665) (50, 16532.333333333332) (60, 45116.0) (70, 115977.0) (80, 272214.6666666667) (90, 453159.0) (100, 880251.0) };
+		\addlegendentry{SMOReg}
+	\end{semilogyaxis}
+	\end{tikzpicture}
+
+	\caption{Classifier performance (combinations)}
+	\label{fig:ClassifierPerformanceCombinations}
+\end{center}
+\end{figure}
+
+For each data point, a new set of data was generated with N attribute values for two attributes (representing the body text and image used at Company A). The data set thus contained \(N^2\) instances from which N instances were removed and put into a set of test data. The removed instances were those combinations of text \(i\) and image \(j\) where \(i = j\). This systematic removal was used to guarantee that no property value would be completely removed, which could potentially happen with a random removal process. The remaining \(N(N-1)\) instances were left as the training set. Each instance in the training data was given metrics, which were drawn from a random distribution.
+
+After this, the time taken for each classifier to initialize itself (i.e. create the underlying data model based on the training data) plus the time required to estimate the N instances from the test data was measured. This was repeated three times for every data point and the average time was calculated.
+
+As can be seen in Figure \ref{fig:ClassifierPerformanceCombinations}, the IBk and REPTree algorithms are really fast, almost constant no matter the size of N. Then comes logistic regression which takes about 21 seconds for \(N = 100\), whereas SMO regression is highly unsuitable for larger data sets since it required more than 14 minutes at the same value for N.
+
+Another aspect of time performance is increasing the number of occurrences of the same ad, each with its own metrics. Continuing with the previous experiment, we fixed \(N\) at 10 and added a second variable \(M\), which is the number of times each ad should occur. The reason for this experiment is to get an idea of whether it is the possible combinations or the actual number of instances which has the most impact on the time it takes to build the estimation model and estimate ads. The results are displayed in Figure \fig{fig:ClassifierPerformanceInstances};
+
+\begin{figure}[htb]
+\begin{center}
+    \begin{tikzpicture}
+    \begin{semilogyaxis}[
+            legend pos=north west,
+            xlabel={M},
+            ylabel={Time (ms)},
+            ymin=1,
+            ymax=10000000
+        ]
+        \addplot coordinates {(10, 203.0) (20, 229.0) (30, 381.6666666666667) (40, 447.3333333333333) (50, 604.0) (60, 784.6666666666666) (70, 810.0) (80, 929.0) (90, 1076.3333333333333) (100, 1265.3333333333333)};
+        \addlegendentry{Logistic}
+
+        \addplot coordinates {(10, 26.0) (20, 19.666666666666668) (30, 19.666666666666668) (40, 9.666666666666666) (50, 11.666666666666666) (60, 12.0) (70, 8.666666666666666) (80, 6.333333333333333) (90, 6.0) (100, 5.666666666666667) };
+        \addlegendentry{REPTree}
+
+        \addplot coordinates {(10, 33.666666666666664) (20, 11.333333333333334) (30, 6.666666666666667) (40, 6.333333333333333) (50, 5.333333333333333) (60, 7.666666666666667) (70, 5.666666666666667) (80, 6.333333333333333) (90, 7.666666666666667) (100, 9.0) };
+        \addlegendentry{IBk}
+
+        \addplot coordinates {(10, 814.6666666666666) (20, 5677.0) (30, 20249.666666666668) (40, 47347.666666666664) (50, 90509.0) (60, 182494.33333333334) (70, 343250.6666666667) (80, 591277.0) (90, 936365.3333333334) (100, 1464336.6666666667) };
+        \addlegendentry{SMOReg}
+    \end{semilogyaxis}
+    \end{tikzpicture}
+
+    \caption{Classifier performance (instances)}
+    \label{fig:ClassifierPerformanceInstances}
+\end{center}
+\end{figure}
+
+The time performance in the two experiments is comparable. The main difference is that logistic regression seems to handle the increase in the number of instances much better than the the increase in combinations of property values. Since \(M=1\) in the first experiment, there are a total of 10000 instances in the generated data set when \(N=100\), which is the same amount as the second experiment has for \(M=100\) when \(N=10\). Still, the time taken is higher by a factor of 16 for the first experiment.
+
+The most time consuming task for the two slower algorithms is building the actual classifier. Depending on how often an organization needs to update the knowledge base, this could have an effect on the choice of classifier. The accuracy of logistic regression will likely outweigh the cost in time in some cases, however for very large sets of data it may be more useful to suffer the loss in accuracy in order to efficiently incorporate new data in the model, in which case the IBk or REPTree are recommended.
 
 \subsection{Selection strategy}
-Once the estimations are made the question becomes how to select which ads to run. Obviously it is reasonable to assume that higher estimates are more likely to perform well, but it is less obvious whether a higher action rate can be expected by selecting multiple ads from the estimates.
+Once the estimations are made the question becomes how to select which ads to run. As described in RQ 1.3, if the goal is to gain the highest average click rate over all running ads, it could perhaps be more effective to choose multiple suggested ads to minimize the impact of erroneous estimations.
 
-Strategy N is defined as the selection strategy where the N highest estimated ads are selected and run. In addition to this, the ads were run either weighted or unweighted. The latter means that all ads are shown the same amount of times, where as the former approach calculates a weight for each ad based on the normalized value of the estimate. Functions for the calculations are shown in equation \ref{eq:CUnweighted} and \ref{eq:CWeighted} respectively. This process was then repeated 5000 times and the values averaged to identify the optimal selection strategy. The results are available in Table \ref{tbl:SelectionStrategy}.
+Strategy N is defined as the selection strategy where the N highest estimated ads are run. In addition to this, the ads were run either weighted or unweighted. The latter means that all ads are shown the same amount of times, whereas the former approach calculates a weight for each ad based on the normalized value of the estimate. Functions for the calculations are shown in Equation \ref{eq:CUnweighted} and \ref{eq:CWeighted} respectively. This process was then repeated 5000 times and the values averaged to identify the optimal selection strategy. The results are available in Table \ref{tbl:SelectionStrategy}.
 
 \begin{equation}
 	c_{unweighted} = \sum_{i=1}^{N} \frac{ c_i }{ N } \\
@@ -518,11 +708,11 @@ As the results reveal, the best approach over time from a purely statistical poi
 While these results do not support any more complicated selection strategy than "best first" as answer to RQ 1.3, they do strengthen the proof for that the classifier indeed provides a good estimate. A strategy where \(N > 1\) would only be better suited if the estimator tended to overestimate the value of the \(N-1\) first ads, so that in fact the N\superscript{th} was the best choice of ad. In other words, the results indicate that the ranking of the suggested ads on \(\hat{c}\) reflect the expected ranking based on \(c\).
 
 \subsection{Influence of time}
-To accurately be able to compare the estimated performance of a new ad with existing ads, it is important to also estimate future performance of already existing ads. For example, if ad performance declines over time, even the best performing ad may reach a point in time where its performance is expected to be worse than that of a new ad.
+To accurately be able to compare the estimated performance of a new ad with existing ads, it is important to also estimate future performance of already existing ads. If ad performance declines over time, even the best performing ad may reach a point in time where its performance is expected to be worse than that of a new ad. The reason for such a decline could be for example because the advertiser will not show a specific ad to a user who has previously clicked it.
 
-In order to be able to analyze this question, described in RQ 1.4, data was collected daily over a period of about two weeks for two separate ads, one targeting men and one targeting women. The reason for choosing two weeks was a trade-off between being able to identify differences between weekdays and those over time (e.g. perhaps weekends sees a higher performance due to an increase in online presence) while not incurring to high costs.
+In order to be able to analyze this question, described in RQ 1.4, data was collected daily over a period of two weeks for two separate ads, one targeting men and one targeting women. The reason for choosing two weeks was a trade-off between being able to identify differences between weekdays and those over time (e.g. perhaps weekends see a higher performance due to an increase in online presence) while not incurring too high costs.
 
-The performance for the ads is presented in Figure \ref{fig:TimeInfluence1} and \ref{fig:TimeInfluence2} respectively. The line represents the mean click rate, where as the bars on each coordinate represent the 90\% confidence interval for the click rate. The values on the x-axis is the day of the week of the measurement. The data was collected between October 3\superscript{rd} and October 17\superscript{th} 2012. It is worth mentioning that October 12, the second Friday in the data set, was a holiday in the targeted region.
+The performance for the ads is presented in Figure \ref{fig:TimeInfluence1} and \ref{fig:TimeInfluence2} respectively. The dots represent the mean click rate for each day, whereas the bars on each coordinate represent the 90\% confidence interval for the click rate. We can calculate this interval since we have made the assumption that the data is normally distributed, as was described in the data set description. The values on the x-axis is the day of the week of the measurement. The data was collected between October 3\superscript{rd} and October 17\superscript{th} 2012. It is worth mentioning that October 12, the second Friday in the data set, was a holiday in the targeted region.
 
 \begin{figure}[htb]
 \begin{center}
@@ -536,7 +726,9 @@ The performance for the ads is presented in Figure \ref{fig:TimeInfluence1} and 
 			legend cell align=left,
 			width=\linewidth,
 			height=0.5\linewidth,
+            ymin=0.0,
 			ymax=0.14,
+            ytick={0.0,0.02,...,0.14},
 			y tick label style={/pgf/number format/fixed},
 			xtick=data,
 			xticklabels={$We$,$Th$,$Fr$,$Sa$,$Su$,$Mo$,$Tu$,$We$,$Th$,$Fr$,$Sa$,$Su$,$Mo$,$Tu$,$We$},
@@ -583,8 +775,10 @@ The performance for the ads is presented in Figure \ref{fig:TimeInfluence1} and 
 			legend cell align=left,
 			width=\linewidth,
 			height=0.5\linewidth,
+            y tick label style={/pgf/number format/fixed},
+            ymin=0.0,
 			ymax=0.14,
-			y tick label style={/pgf/number format/fixed},
+            ytick={0.0,0.02,...,0.14},
 			xtick=data,
 			xticklabels={$We$,$Th$,$Fr$,$Sa$,$Su$,$Mo$,$Tu$,$We$,$Th$,$Fr$,$Sa$,$Su$,$Mo$,$Tu$,$We$},
 			x tick label style={rotate=90,anchor=east},
@@ -626,6 +820,10 @@ There is some indication that given a longer time period there might be a declin
 \label{ch:Conclusion}
 In this thesis we have shown a technique for developing an automated system that provides decision support to organizations working with social network marketing. We have also described and performed experiments which validate our solution.
 
+The experiments indicated that the most accurate estimator for ad click rates was the logistic regression, however a performance analysis revealed that it might be too slow for large data sets. For such a case, a faster algorithm such as the REPTree is recommended, which does not suffer from the same exponential increase in time while still retaining a useful level of accuracy.
+
+The software solution consists of three basic components. The Data Manager is responsible for interacting with the knowledge base of all previously collected information. This data is then used by the Estimator, which models the data in order to provide estimates of new ads. The ads to be estimated are generated by the Ad Factory, and typically does so by generating combinations of ad properties which do not exist in the knowledge base. To interact with the system, these components need to be combined in a user interface, which most likely will be graphical though that is not a requirement.
+
 The next subsection will discuss possible concerns regarding the validity of the research shown in this paper, followed by possible future work to extend and improve upon this work.
 
 \subsection{Validity}
@@ -643,6 +841,8 @@ Due to circumstances described in the introduction, the targeting of ads was rem
 A more advanced variant of the above problem is that of attributes which can be described using scalar values. An example of this could be age, where it would be reasonable to expect that people whose age is only a year or two apart would be attracted to the same properties in an ad. Simply dividing the data sets by age would probably lead to an even greater loss of information than the cases described previously.
 
 Though this thesis has limited the scope of the system for use with social networks, it would be useful to develop the technique further to deal with multiple classes of advertisement, such as for example search and contextual advertisement, since many organization combine classes to expand their audience.
+
+Finally, in the discussion regarding the impact of different properties, the idea that the gender of a marketing expert could strongly influence how well ads perform was presented. This could very well be the hypothesis of future work in the field of marketing.
 
 \bibliographystyle{abbrv}
 \bibliography{references} % references.bib
