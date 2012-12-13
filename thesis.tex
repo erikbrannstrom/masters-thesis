@@ -13,6 +13,7 @@
 \usepackage{subfigure}
 \usepackage{natbib}
 \usepackage{pgfplots}
+\usepackage{multirow}
 % Sub- and superscript
 \newcommand{\superscript}[1]{\ensuremath{^{\textrm{#1}}}}
 \newcommand{\subscript}[1]{\ensuremath{_{\textrm{#1}}}}
@@ -638,7 +639,7 @@ After this, the time taken for each classifier to initialize itself (i.e. create
 
 As can be seen in Figure \ref{fig:ClassifierPerformanceCombinations}, the IBk and REPTree algorithms are really fast, almost constant no matter the size of N. Then comes logistic regression which takes about 21 seconds for \(N = 100\), whereas SMO regression is highly unsuitable for larger data sets since it required more than 14 minutes at the same value for N.
 
-Another aspect of time performance is increasing the number of occurrences of the same ad, each with its own metrics. Continuing with the previous experiment, we fixed \(N\) at 10 and added a second variable \(M\), which is the number of times each ad should occur. The reason for this experiment is to get an idea of whether it is the possible combinations or the actual number of instances which has the most impact on the time it takes to build the estimation model and estimate ads. The results are displayed in Figure \fig{fig:ClassifierPerformanceInstances};
+Another aspect of time performance is increasing the number of occurrences of the same ad, each with its own metrics. Continuing with the previous experiment, we fixed \(N\) at 10 and added a second variable \(M\), which is the number of times each ad should occur. The reason for this experiment is to get an idea of whether it is the possible combinations or the actual number of instances which has the most impact on the time it takes to build the estimation model and estimate ads. The results are displayed in Figure \ref{fig:ClassifierPerformanceInstances}.
 
 \begin{figure}[htb]
 \begin{center}
@@ -673,10 +674,12 @@ The time performance in the two experiments is comparable. The main difference i
 
 The most time consuming task for the two slower algorithms is building the actual classifier. Depending on how often an organization needs to update the knowledge base, this could have an effect on the choice of classifier. The accuracy of logistic regression will likely outweigh the cost in time in some cases, however for very large sets of data it may be more useful to suffer the loss in accuracy in order to efficiently incorporate new data in the model, in which case the IBk or REPTree are recommended.
 
+\eb{Mention we went with IBk at Company A}
+
 \subsection{Selection strategy}
 Once the estimations are made the question becomes how to select which ads to run. As described in RQ 1.3, if the goal is to gain the highest average click rate over all running ads, it could perhaps be more effective to choose multiple suggested ads to minimize the impact of erroneous estimations.
 
-Strategy N is defined as the selection strategy where the N highest estimated ads are run. In addition to this, the ads were run either weighted or unweighted. The latter means that all ads are shown the same amount of times, whereas the former approach calculates a weight for each ad based on the normalized value of the estimate. Functions for the calculations are shown in Equation \ref{eq:CUnweighted} and \ref{eq:CWeighted} respectively. This process was then repeated 5000 times and the values averaged to identify the optimal selection strategy. The results are available in Table \ref{tbl:SelectionStrategy}.
+Strategy N is defined as the selection strategy where the N highest estimated ads are run. In addition to this, the ads were run either weighted or unweighted. The latter means that all ads are shown the same amount of times, whereas the former approach calculates a weight for each ad based on the normalized value of the estimate. Functions for the calculations are shown in Equation \ref{eq:CUnweighted} and \ref{eq:CWeighted} respectively. This process was then repeated 5000 times and the values averaged to identify the optimal selection strategy. The results are available in Table \ref{tbl:SelectionStrategy} for both logistic regression and IBk.
 
 \begin{equation}
 	c_{unweighted} = \sum_{i=1}^{N} \frac{ c_i }{ N } \\
@@ -689,23 +692,29 @@ Strategy N is defined as the selection strategy where the N highest estimated ad
 
 \begin{table}
 \begin{center}
-	\begin{tabular}{  l | r  r  }
+	\begin{tabular}{ l || c | r  r  }
+        \hline
+		\textbf{Algorithm} & \textbf{N} & Unweighted & Weighted \\
 		\hline
-		\textbf{No. of ads} & \textbf{Unweighted} & \textbf{Weighted} \\
-		\hline
-		1 & 0.0214\% & 0.0214\% \\
-		2 & 0.0209\% & 0.0209\% \\
-		3 & 0.0206\% & 0.0206\% \\
+		\multirow{3}{*}{Logistic}
+         & 1 & 0.0209\% & 0.0208\% \\
+		 & 2 & 0.0201\% & 0.0201\% \\
+		 & 3 & 0.0192\% & 0.0192\% \\
+         \hline
+         \multirow{3}{*}{IBk}
+         & 1 & 0.0205\% & 0.0203\% \\
+         & 2 & 0.0197\% & 0.0197\% \\
+         & 3 & 0.0190\% & 0.0190\% \\
 		\hline
 	\end{tabular}
-	\caption{Averaged real action rate for selection strategies}
+	\caption{Averaged real click rate for selection strategies N}
 	\label{tbl:SelectionStrategy}
 \end{center}
 \end{table}
 
-As the results reveal, the best approach over time from a purely statistical point of view is to only select the ad with the highest estimated performance. Other reasons for choosing multiple suggestions may of course exist, such as diversifying for potential target groups for example, but those choices need to be made by a domain expert. It is also interesting to note that the weighting of ads carries no additional boost nor any negative effect to the average performance.
+As the results reveal, the best approach over time from a purely statistical point of view is to only select the ad with the highest estimated performance, no matter which of the two algorithms is used. Other reasons for choosing multiple suggestions may of course exist, such as diversifying for potential target groups for example, but those choices need to be made by a domain expert. It is also interesting to note that the weighting of ads carries no additional boost nor any significant negative effect to the average performance.
 
-While these results do not support any more complicated selection strategy than "best first" as answer to RQ 1.3, they do strengthen the proof for that the classifier indeed provides a good estimate. A strategy where \(N > 1\) would only be better suited if the estimator tended to overestimate the value of the \(N-1\) first ads, so that in fact the N\superscript{th} was the best choice of ad. In other words, the results indicate that the ranking of the suggested ads on \(\hat{c}\) reflect the expected ranking based on \(c\).
+While these results do not support any more complicated selection strategy than "best first" as answer to RQ 1.3, they do strengthen the proof for that the classifiers indeed provides a good estimate. A strategy where \(N > 1\) would only be better suited if the estimator tended to overestimate the value of the \(N-1\) first ads, so that in fact the N\superscript{th} was the best choice of ad. In other words, the results indicate that the ranking of the suggested ads on \(\hat{c}\) reflect the expected ranking based on \(c\).
 
 \subsection{Influence of time}
 To accurately be able to compare the estimated performance of a new ad with existing ads, it is important to also estimate future performance of already existing ads. If ad performance declines over time, even the best performing ad may reach a point in time where its performance is expected to be worse than that of a new ad. The reason for such a decline could be for example because the advertiser will not show a specific ad to a user who has previously clicked it.
@@ -816,6 +825,9 @@ By following the performance over the three Wednesdays in the data set, both ads
 
 There is some indication that given a longer time period there might be a decline, though this experiment cannot prove such a theory.
 
+\subsection{User interface}
+\eb{Screenshot and short discussion}
+
 \section{Conclusion}
 \label{ch:Conclusion}
 In this thesis we have shown a technique for developing an automated system that provides decision support to organizations working with social network marketing. We have also described and performed experiments which validate our solution.
@@ -843,6 +855,9 @@ A more advanced variant of the above problem is that of attributes which can be 
 Though this thesis has limited the scope of the system for use with social networks, it would be useful to develop the technique further to deal with multiple classes of advertisement, such as for example search and contextual advertisement, since many organization combine classes to expand their audience.
 
 Finally, in the discussion regarding the impact of different properties, the idea that the gender of a marketing expert could strongly influence how well ads perform was presented. This could very well be the hypothesis of future work in the field of marketing.
+
+\section{Acknowledgements}
+We would like to thank our thesis supervisor Matthias Tichy for his support and the ideas he provided throughout this project. We would also like to thank our industrial supervisor as well as the marketing people at Company A for sharing their knowledge and giving us feedback on our work.
 
 \bibliographystyle{abbrv}
 \bibliography{references} % references.bib
