@@ -599,7 +599,7 @@ Based on these results, we then selected the four classifiers with the highest s
 \end{center}
 \end{figure}
 
-\eb{Discuss MSQE results.}
+It is interesting that logistic regression has the lowest upper limit of the box, which means most of its estimation errors are very small, however it also has the highest top whisker which implies that there are also times when estimations are completely off. IBk on the other hand has the lowest top whisker, and as such has a lower spread, even though it may not be quite as accurate as the regression in many cases. That being said, IBk still has the second lowest upper limit of its box and those two properties put together make it an interesting choice.
 
 There is however another aspect of classifiers that is interesting to analyze further before drawing any final conclusions, namely performance. The four classifiers with the highest success rates above the 50\% threshold were analyzed from a timing point of view. The results are in Figure \ref{fig:ClassifierPerformanceCombinations}, where the time measured in milliseconds is shown on a logarithmic scale.
 
@@ -674,7 +674,7 @@ The time performance in the two experiments is comparable. The main difference i
 
 The most time consuming task for the two slower algorithms is building the actual classifier. Depending on how often an organization needs to update the knowledge base, this could have an effect on the choice of classifier. The accuracy of logistic regression will outweigh the cost in time in some cases, however for large sets of data it may be more useful to suffer the slight loss in accuracy in order to efficiently incorporate new data in the model, in which case the IBk is recommended, since its mean squared error is lower than the REPTree.
 
-For Company A we decided to use the faster IBk algorithm, because they expected to reach the limits of what logistic regression can handle without taking so much time so that it affects the user experience. Another option discussed was having functionality in the user interface to switch between algorithms, but the idea was discarded for two reasons. First of all, the data set would most likely grow fast enough so that a switch would be required very soon anyway, and secondly there was the problem of making such a function understandable for the average operator, since they are not expected to know about classification algorithms.
+For Company A we decided to use the faster IBk algorithm, because they expected to reach the limits of what logistic regression can handle without requiring so much time that it affects the user experience. Another option discussed was having functionality in the user interface to switch between algorithms, but the idea was discarded for two reasons. First of all, the data set would most likely grow fast enough so that a switch would be required very soon anyway, and secondly there was the problem of making such a function understandable for the average operator, since they are not expected to know about classification algorithms.
 
 \subsection{Selection strategy}
 Once the estimations are made the question becomes how to select which ads to run. As described in RQ 1.3, if the goal is to gain the highest average click rate over all running ads, it could perhaps be more effective to choose multiple suggested ads to minimize the impact of erroneous estimations.
