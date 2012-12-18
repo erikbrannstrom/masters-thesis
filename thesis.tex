@@ -139,6 +139,7 @@ The solution has been validated on real-world data from an industrial partner in
 \keywords{Online marketing, business intelligence, performance estimation, social networks}
 
 % \category{D.1.5}{Programming Techniques}{Object-oriented Programming}
+\category{D.2}{Software}{Software Engineering}
 \category{I.2.6}{Artificial Intelligence}{Learning}
 \category{J.1}{Administrative Data Processing}{Marketing}
 
@@ -164,7 +165,7 @@ A site that displays advertisement, the publisher, is often paid by the advertis
 
 A domain description is shown in Figure \ref{fig:MarketingTerminology}. A \emph{marketing campaign}, or simply a \emph{campaign}, is comprised of one or more advertising messages, \emph{ads}, that are directed to one defined audience, the \emph{target} or \emph{target group} (e.g. gender or people searching for certain keywords). Any ad, and by extension campaign, have numeric measures of success called \emph{metrics}. The most commonly used are \emph{impressions}, which is the number of times an ad has been shown, and clicks.
 
-\begin{figure*}[htb] \centering \includegraphics[width=0.6\textwidth]{marketing-uml.eps}
+\begin{figure*}[htb] \centering \includegraphics[width=0.58\textwidth]{marketing-uml.eps}
 	\caption{UML description of marketing terminology.}
 	\label{fig:MarketingTerminology}
 \end{figure*}
@@ -176,9 +177,9 @@ The targeting properties available also depend on the publisher. For the purpose
 \subsubsection{Business intelligence}
 Marketing, perhaps especially online, will typically generate large amounts of data. These data sets are then used as a foundation for future decision making. Business intelligence is a rather loosely defined term, but it is highly relevant to this concept of using past data to future decisions.
 
-Negash defines business intelligence systems as those that ``combine data gathering, data storage, and knowledge management with analytical tools to present complex internal and competitive information to planners and decision makers'' \cite{Negash2004}, whereas Golfarelli et al. use the broader definition of ``the process of turning data into information and then into knowledge'' \cite{Golfarelli2004}. Even though neither definition explicitly mention the use of computers and software for processing the data, it is an integral part of modern business intelligence systems.
+Negash defines business intelligence systems as those that ``combine data gathering, data storage, and knowledge management with analytical tools to present complex internal and competitive information to planners and decision makers'' \cite{Negash2004}, whereas Golfarelli et al. use the broader definition of ``the process of turning data into information and then into knowledge'' \cite{Golfarelli2004}. Even though neither definition explicitly mentions the use of computers and software for processing the data, it is an integral part of modern business intelligence systems.
 
-The data used in these types of system is generally classified as either structured or semi-structured, as described by Negash \cite{Negash2004}. Though the difference may not always be clear cut, structured data is the type of data which typically resides in databases and custom relationship management (CRM) applications so that it can easily be searched, updated, aggregated, etcetera. Semi-structured data on the other hand is that which cannot be parsed as easily by software, such as e-mails, movies, reports and phone conversations. The author also describes that data can be further categorized based on its source; either internal or external. This framework helps define the data type for which this thesis is relevant, namely internal structured data.
+The data used in these types of systems are generally classified as either structured or semi-structured, as described by Negash \cite{Negash2004}. Though the difference may not always be clear cut, structured data is the type of data which typically resides in databases and custom relationship management (CRM) applications so that it can easily be searched, updated, aggregated, etcetera. Semi-structured data on the other hand is that which cannot be parsed as easily by software, such as e-mails, movies, reports and phone conversations. The author also describes that data can be further categorized based on its source; either internal or external. This framework helps define the data type for which this thesis is relevant, namely internal structured data.
 
 Business intelligence includes a large number of software engineering related areas. For example, the task of identifying useful knowledge from data sets is a field known as knowledge discovery, which in turn often utilizes data mining.
 
@@ -208,9 +209,9 @@ The basic requirement of a system which could solve the previously stated proble
 
 The proposed solution is to apply the principles of automation described in the MAPE framework to the context of marketing. Monitoring is thus the collection of metrics for online advertisement. To optimize these metrics, the gathered information is analyzed and this analysis forms the basis for the planning of future campaigns to run. Once the plans are completed, they are presented to the operator who can execute them, after which new metrics are gathered and so on.
 
-It is already common for monitoring to be automated, either using custom software or services such as Google Analytics, whereas the other parts of the process are performed manually. It is infeasible to fully automate the whole process, due to for example the creative side of advertisement including creating new photos and writing new texts. There are however certain areas that can be automated and this paper will focus on automated analysis and planning of online marketing campaigns, shown in Figure \ref{fig:MAPEMarketing}.
+It is already common for monitoring to be automated, either using custom software or services such as Google Analytics\footnote{http://www.google.com/analytics/}, whereas the other parts of the process are performed manually. It is infeasible to fully automate the whole process, due to for example the creative side of advertisement including creating new photos and writing new texts. There are however certain areas that can be automated and this paper will focus on automated analysis and planning of online marketing campaigns, shown in Figure \ref{fig:MAPEMarketing}.
 
-\begin{figure}[htb] \centering \includegraphics[width=\columnwidth]{mape-marketing.eps}
+\begin{figure}[htb] \centering \includegraphics[width=0.96\columnwidth]{mape-marketing.eps}
 	\caption{Online marketing automation system in control loop}
 	\label{fig:MAPEMarketing}
 \end{figure}
@@ -224,7 +225,7 @@ Using the MAPE framework in Figure \ref{fig:MAPE}, only the analysis and plannin
 
 Furthermore, the data set will include attributes whose values are free text and images, however text mining and image recognition are beyond the scope of this project.
 
-The model of the marketing domain purposefully excluded references to costs and budgets. Though the economy of marketing is of great interest to the advertiser, we have assumed that the most important part of the process is to optimize the number of actions. This assumption was approved by our industrial partner.
+The model of the marketing domain purposefully excluded references to costs and budgets. Though the economy of marketing is of great interest to the advertiser, we have assumed that the most important part of the process is to optimize the number of actions (which in our specific case is the same as clicks, as mentioned previously). This assumption was approved by our industrial partner.
 
 On the topic of costs and budgets, it is also necessary to mention that due to the costs of running advertisement, there was a limitation on the types of experiments we could perform. Thus large scale live testing of the system is not included in the scope of this thesis.
 
@@ -302,7 +303,7 @@ To answer the question, a controlled experiment was defined were ad properties w
 \textit{\textbf{RQ 1.2.} How well do classifiers perform in estimating click rates?}
 The first step is to identify whether or not a numerical classifier can, based on historical data, adequately estimate the action rate of previously unseen ads. It is thus a matter of evaluating the performance of existing algorithms.
 
-To provide an answer to the question an experiment was defined, where the success rate of a regression model was compared to those of random values from statistical distributions, one normally distributed and one uniform distribution with the same minimum and maximum values as the data set, as well as comparing success rates of different classifiers to each other. The results answer both how well classifiers perform in relation to simpler models, and if they performs better, which classifier is most suited for the task.
+To provide an answer to the question an experiment was defined, where the success rate of a regression model was compared to those of random values from statistical distributions, one normally distributed and one uniform distribution with the same minimum and maximum values as the data set, as well as comparing success rates of different classifiers to each other. The results answer both how well classifiers perform in relation to simpler models, and if they perform better, which classifier is most suited for the task.
 
 \textit{\textbf{RQ 1.3.} Which ad selection strategy provides the highest average click rate?}
 It is unlikely that a classifier would correctly estimate future ad performance every time. To potentially minimize the impact of bad estimations, multiple suggested ads could be selected by the operator and run together in order to improve the average action rate.
@@ -311,13 +312,13 @@ To evaluate this six different strategies were tested, where one, two and three 
 
 \textit{\textbf{RQ 1.4.} How does time affect the performance of ads?}
 A marketing executive suggested that the performance of ads declines over time. To evaluate the correctness of this statement, data was gathered over a period of two weeks where the same ads were run continuously and then analyzed. Depending on the answer, the final solution would possibly have to account for such a decline in estimating the future performance of existing ads.
-
+\newpage
 \subsection{Data set}
 The main data set used for analysis and experiments was provided by Company A and consisted of ads run in the Polish market between July 17\superscript{th} and August 17\superscript{th} 2012. The set contained 959 instances of ads run on Facebook in the mentioned time interval. All ads had however not been run for the whole time.
 
 There were a total of eight (8) unique titles, but six of those where almost equal with only difference being the city they referred to. The body texts had three (3) distinct values, and by counting the titles referring to a city as a single title, every title was used exclusively together with a single body text so that only three possible title/body combinations existed. A total of eleven (11) unique images were used, out of which five (5) were used when targeting both genders and each gender having three (3) exclusive images. Figure \ref{fig:AdLayout} shows the layout used by Facebook, with the title above the image and the body text to the right of the image. This layout is fixed and cannot be modified by the operator, who can only set the individual properties for the ad (and of course also targeting properties).
 
-\begin{figure}[htpb]
+\begin{figure}[htb]
 	\centering
 	\includegraphics[width=\columnwidth]{ad-layout.eps}
 	\caption{Layout for ad presentation}
@@ -331,7 +332,7 @@ Over the course of this project, Company A made some changes to their marketing 
 \subsubsection{Tagging data}
 An early idea on how to modify the data to provide more insights for the operator was to apply tags to the images and texts. Tags are a set of words that describe an object, so that similarities can be discerned more easily by a computer system. There were however two main problems with this method. First of all, there is the question of subjectivity. This is especially a problem for pictures, whose information content is highly unstructured making the set of possible attributes that are important hard to define. As an example, imagine an ad with a picture of a girl sitting in a coffee shop. A user's likelihood of clicking the ad may either increase or decrease depending on the looks of the girl, the lighting in the room, what beverage the girl is drinking, whether there are other people around or not, etcetera. The subjectivity involved (who decides whether a person is good-looking or not?) and the nearly unlimited possible attributes were the main reasons for ruling out image tagging.
 
-For texts it is possible to remove a lot of the problems with image tagging by only focusing on the actual words that appear. This does however lead to a new problem, which would also have affected image tagging if it was applied despite the concerns raised. Consider the case of two high performing ads, one with the tags "beach" and "volleyball", the other one with tags "snow" and "skiing". Because a classifier is not aware of the context, it would likely estimate that an ad focusing on for example "beach" and "snow" would have a very high click rate, though this is unlikely. Also considering that tagging could easily introduce thousands or millions of possible combinations to be estimated, this would mean the operator would need to do a lot of extra work in ruling out these misguided suggestions and the whole purpose of the system would be defeated.
+For texts it is possible to remove a lot of the problems with image tagging by only focusing on the actual words that appear. This does however lead to a new problem, which would also have affected image tagging if it was applied despite the concerns raised. Consider the case of two high performing ads, one with the tags "beach" and "volleyball", the other one with tags "snow" and "skiing". Because a classifier is not aware of the context, it is feasible that it would estimate an ad focusing on for example "beach" and "snow" to have a very high click rate, though this is in reality unlikely to be true. Also considering that tagging could easily introduce thousands or millions of possible combinations to be estimated, this would mean the operator would need to do a lot of extra work in ruling out these misguided suggestions and the whole purpose of the system would be defeated.
 
 \subsubsection{Statistical distribution}
 A visual analysis of a graph of the click rates hinted of a normal distribution. To judge whether this was the case, the extended Shapiro-Wilks normality test \citep{Royston1982} as implemented in R\footnote{http://www.r-project.org/} was used. Ads that had not received any clicks were considered to be outliers and removed from the sampling to not skew the results. This turned out to only affect a single ad.
@@ -344,7 +345,7 @@ When no specification is made in regard to which data set was used for a specifi
 \label{ch:Solution}
 The proposed solution to the problem is to automate the creation of good ads for online marketing using a software system. Figure \ref{fig:SWArchitecture} gives an overview of the architecture for such a system. The main components include a data manager for interacting with the knowledge base, an estimator that based on historical data can estimate the performance of new ads and an ad factory that can provide new ads with unknown performance to, for example, an estimator.
 
-\begin{figure}[htpb]
+\begin{figure}[htb]
 	\centering
 	\includegraphics[width=\columnwidth]{sw-architecture.eps}
 	\caption{Component diagram of software solution}
@@ -353,7 +354,7 @@ The proposed solution to the problem is to automate the creation of good ads for
 
 In order to answer the research questions, the estimator, which is the central part of the system, must be evaluated. By having an evaluator which controls the interfaces to and from the estimator as in Figure \ref{fig:SWEvaluator}, we can create a number of different evaluators to test different aspects of the estimation.
 
-\begin{figure}[htpb]
+\begin{figure}[htb]
 	\centering
 	\includegraphics[width=0.65\columnwidth]{sw-evaluator.eps}
 	\caption{Component diagram of system evaluation}
@@ -531,7 +532,7 @@ Even though the SMO algorithm performed well for estimation, the choice of algor
 
 All numerical classifiers from the library were explored. Besides the previously mentioned SMO algorithm, the classifiers used were standard linear regression (\textit{LinearRegression}), a model tree that can have linear models at the leaves (\textit{M5P}), an extension of the nearest neighbor approach called instance-based learning (\textit{IBk}), a back-propagation classifier (\textit{MultilayerPerceptron}) and a regression tree (\textit{REPTree}) \cite{Witten2011}. In addition to this, the library's logistic regression implementation (\textit{Logistic}) was evaluated. Figure \ref{fig:ClassifierComparison} shows the results.
 
-\begin{figure}[htpb]
+\begin{figure}[htb]
 \begin{center}
 	\begin{tikzpicture}
 	\begin{axis}[
@@ -586,7 +587,7 @@ Because the increase of the success rate is not exactly linear, there is no clea
 
 Based on these results, we selected the four classifiers with the highest success rates above the 50\% threshold to run additional experiments on. The first one was to analyze in more detail the size of the estimation errors. To do this, the same experiment as before was run, but instead of calculating success rates we instead calculated the mean squared error over 5000 runs. The results are presented in Figure \ref{fig:ClassifierMSQE}. The box contains the values between the 25\superscript{th} and 75\superscript{th} percentiles with the line inside marking the median value. The bottom and top whiskers show the 10\superscript{th} and 90\superscript{th} percentile respectively.
 
-\begin{figure}[htpb]
+\begin{figure}[htb]
 \begin{center}
 	\begin{tikzpicture}
 	\begin{axis} [xtick=data, symbolic x coords={IBk,REPTree,Logistic,SMOReg},
@@ -598,14 +599,14 @@ Based on these results, we selected the four classifiers with the highest succes
 	\end{axis}
 	\end{tikzpicture}
 
-	\caption{Mean square error for classifiers with highest success rate}
+	\caption{Mean squared error for classifiers with highest success rate}
 	\label{fig:ClassifierMSQE}
 \end{center}
 \end{figure}
 
-It is interesting that logistic regression has the lowest upper limit of the box, which means most of its estimation errors are very small, however it also has the highest top whisker which implies that there are also times when estimations are completely off. IBk on the other hand has the lowest top whisker, and as such has a lower spread, even though it may not be quite as accurate as the regression in many cases. That being said, IBk still has the second lowest upper limit of its box and those two properties put together make it an interesting choice.
+It is interesting that logistic regression has the lowest upper limit of the box, which means most of its estimation errors are very small, however it also has the highest top whisker which implies that there are also times when estimations are completely off. IBk on the other hand has the lowest top whisker, and as such has a lower spread, even though it may not be quite as accurate as the regression in many cases. That being said, IBk still has the second lowest upper limit of its box and the lowest median. These properties put together make it an interesting choice. To give an example of what these values mean, we can mention that the median value for IBk is \(0.599 \cdot 10^{-9}\), which gives a root-mean-square deviation of 0.0024\% in the estimated click rates.
 
-There is however another aspect of classifiers that is interesting to analyze further before drawing any final conclusions, namely performance. The four classifiers with the highest success rates above the 50\% threshold were analyzed from a timing point of view. The results are in Figure \ref{fig:ClassifierPerformanceCombinations}, where the time measured in milliseconds is shown on a logarithmic scale.
+There is however another aspect of classifiers that is interesting to analyze further before drawing any final conclusions, namely performance. The four classifiers with the highest success rates above the 50\% threshold were analyzed from a timing point of view. The results are in Figure \ref{fig:ClassifierPerformanceCombinations}, where the time measured in milliseconds is shown on a logarithmic scale. The experiments were performed on a MacBook Pro with a 2.2 GHz Intel Core i7 processor and 8 GB of memory.
 
 \begin{figure}[htb]
 \begin{center}
@@ -832,7 +833,7 @@ There is some indication that given a longer time period there might be a declin
 \subsection{User interface}
 A graphical user interface was developed to make it easier for an operator to use the system, without dealing with command-lines and doing research into classification. Perhaps the most interesting components are the ones used for targeting (top left) and filtering (bottom), as shown in the screenshot in Figure \ref{fig:GUI}.
 
-\begin{figure}[htpb]
+\begin{figure}[htb]
     \centering
     \includegraphics[width=\columnwidth]{gui-screenshot.png}
     \caption{Graphical user interface}
@@ -845,6 +846,7 @@ The filtering was added to limit which data is shown to the operator, since data
 
 There are also buttons for showing average click rate for each image and each text respectively, in order to quickly get an idea of which properties leads to high performing ads. Another implemented feature was multiple knowledge bases which is useful for managing data sets that should not have any effect on each other, for example ads targeting countries with different languages.
 
+\newpage
 \section{Conclusion}
 \label{ch:Conclusion}
 In this thesis we have shown a technique for developing an automated system that provides decision support to organizations working with social network marketing. We have also described and performed experiments which validate our solution.
